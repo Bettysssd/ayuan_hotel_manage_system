@@ -1,17 +1,18 @@
 package com.comfort.hotel.domain.entity;
 
+import java.io.Serializable;
 import java.util.Date;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 /**
- * 【请填写功能名称】对象 user
- *
- * @author ayuan
- * @date 2024-08-29
+ * @Author: ayuan
+ * @PS: 用户实体
+ * @Date: 2024/9/2 15:33
  */
 @Data
-public class User {
+public class User implements Serializable {
+
     private static final long serialVersionUID = 1L;
 
     /** 用户ID */

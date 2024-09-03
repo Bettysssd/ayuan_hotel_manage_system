@@ -1,4 +1,3 @@
-
 # mysql数据库连接
 spring:
   datasource:
@@ -9,15 +8,43 @@ spring:
   mvc:
     path match:
       matching-strategy: ant_path_matcher
+  # 设置文件上传的大小
+  servlet:
+    multipart:
+      max-file-size: 512MB
+      max-request-size: 512MB
   redis:
-    database: 0
+    # 连接超时 毫秒
+    connectTimeout: 1800
+    # 连接超时时间
+    timeout: 60s
     host: 127.0.0.1
     port: 6379
+    database: 0
     password: 123456
     jedis:
       pool:
-        max-active: 20
-
+        # 连接池中的最小空闲连接
+        min-idle: 0
+        # 连接池中的最大空闲连接
+        max-idle: 8
+        # 连接池的最大数据库连接数
+        max-active: 8
+        # #连接池最大阻塞等待时间（使用负值表示没有限制）
+        max-wait: 3600ms
+  # qq邮箱发送配置
+  mail:
+    host: smtp.qq.com
+    port: 465
+    username: 110827295@qq.com
+    password: rmpnbdunbvixcbda
+    default-encoding: utf-8
+    properties:
+      mail:
+        smtp:
+          socketFactory:
+            class: javax.net.ssl.SSLSocketFactory
+      debug: true
 # mybatis
 mybatis:
   mapper-locations: classpath:mappers/*xml
