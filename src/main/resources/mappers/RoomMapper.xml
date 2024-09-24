@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.comfort.hotel.mapper.RoomMapper">
+
+<!--        配置映射关系-->
+    <resultMap id="room_result_map" type="com.comfort.hotel.domain.dto.RoomDTO">
+        <result column="room_id" property="roomId"/>
+        <result column="room_cover" property="roomCover"/>
+        <result column="room_info" property="roomInfo"/>
+        <result column="room_type" property="roomType"/>
+        <result column="room_status" property="roomStatus"/>
+        <result column="room_mark" property="roomMark"/>
+        <result column="number_of_occupants" property="numberOfOccupants"/>
+        <result column="list_of_members" property="listOfMembers"/>
+        <result column="room_rating" property="roomRating"/>
+        <result column="room_trump_up" property="roomTrumpUp"/>
+        <result column="room_trump_down" property="roomTrumpDown"/>
+        <result column="price" property="price"/>
+        <result column="book_time" property="bookTime"/>
+        <result column="check_in_time" property="checkInTime"/>
+        <result column="check_out_time" property="checkOutTime"/>
+    </resultMap>
+
+
+    <sql id="room_column_list">
+       r.`room_id`,
+      `room_cover`,
+       `room_info`,
+       `room_type`,
+       `room_status`,
+       `room_mark`,
+       `number_of_occupants`,
+       `price`,
+       `room_rating`,
+       `room_trump_up`,
+       `room_trump_down`,
+       r.`book_time`,
+       `check_in_time`,
+       `check_out_time`,
+    </sql>
+
+    <insert id="addRoomInfo" parameterType="com.comfort.hotel.domain.dto.RoomDTO">
+        insert into room
+        <set>
+            <if test="bean.roomId != null">
+                room_id = #{bean.roomId},
+            </if>
+            <if test="bean.roomInfo != null">
+                room_info = #{bean.roomInfo},
+            </if>
+            <if test="bean.roomCover != null">
+                room_cover = #{bean.roomCover},
+            </if>
+            <if test="bean.price != null">
+                price = #{bean.price},
+            </if>
+            <if test="bean.numberOfOccupants != null">
+                number_of_occupants = #{bean.numberOfOccupants},
+            </if>
+            <if test="bean.roomMark != null">
+                room_mark = #{bean.roomMark},
+            </if>
+            <if test="bean.roomType != null">
+                room_type = #{bean.roomType},
+            </if>
+        </set>
+    </insert>
+
+    <update id="updateRoomInfo" parameterType="com.comfort.hotel.domain.dto.RoomDTO">
+        update
+            room
+      <set>
+          <if test="bean.roomInfo != null">
+              room_info = #{bean.roomInfo},
+          </if>
+          <if test="bean.roomCover != null">
+              room_cover = #{bean.roomCover},
+          </if>
+          <if test="bean.numberOfOccupants != null">
+              number_of_occupants = #{bean.numberOfOccupants},
+          </if>
+          <if test="bean.roomMark != null">
+              room_mark = #{bean.roomMark},
+          </if>
+          <if test="bean.roomType != null">
+              room_type = #{bean.roomType},
+          </if>
+          <if test="bean.price != null">
+              price = #{bean.price},
+          </if>
+      </set>
+        where room_id = #{bean.roomId}
+    </update>
+
+    <select id="selectRoomList" resultMap="room_result_map">
+        select
+        <include refid="room_column_list"/>
+        GROUP_CONCAT(DISTINCT `user_name` SEPARATOR ', ') AS `list_of_members`
+        from room r
+        left join user on user.room_id = r.room_id
+        <where>
+            <if test="keyword != null and keyword !=''">
+                AND (
+                room_info LIKE CONCAT('%', #{keyword}, '%')
+                OR price LIKE CONCAT('%', #{keyword}, '%')
+                OR room_mark LIKE CONCAT('%', #{keyword}, '%')
+                OR user_name LIKE CONCAT('%', #{keyword}, '%')
+                )
+            </if>
+        </where>
+        group by r.room_id
+        order by r.book_time desc
+    </select>
+    <select id="distinguishVariableRoom" resultType="java.lang.Integer">
+        select count(1)
+        from room
+        <where>
+            <if test="types != null">
+                and room_type in
+                <foreach item="type" collection="types" open="(" close=")" separator=",">
+                    #{type}
+                </foreach>
+            </if>
+            <if test="status != null">
+                and room_status = #{status}
+            </if>
+        </where>
+    </select>
+
+
+</mapper>

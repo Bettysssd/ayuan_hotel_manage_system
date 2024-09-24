@@ -2,7 +2,8 @@
 SQLyog Ultimate v12.09 (64 bit)
 MySQL - 8.0.12 : Database - hotel
 *********************************************************************
-*/
+*/
+
 
 /*!40101 SET NAMES utf8 */;
 
@@ -117,7 +118,7 @@ CREATE TABLE `user` (
   `user_cover` varchar(10) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT '用户头像',
   `user_name` varchar(15) COLLATE utf8_unicode_ci NOT NULL COMMENT '用户姓名',
   `nick_name` varchar(20) COLLATE utf8_unicode_ci NOT NULL COMMENT '用户昵称',
-  `qq_email` varchar(20) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '用户账号，使用邮箱注册',
+  `email` varchar(20) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '用户账号，使用邮箱注册',
   `password` varchar(20) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL DEFAULT '123456' COMMENT '密码,第一次赋初始化，稍后修改',
   `gender` int(11) NOT NULL DEFAULT '0' COMMENT '性别-> 0: 男， 1: 女',
   `sign_in_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '用户注册时间',

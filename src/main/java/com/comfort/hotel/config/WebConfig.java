@@ -1,12 +1,7 @@
 package com.comfort.hotel.config;
 
 import com.comfort.hotel.interceptor.LoginInterceptor;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
-import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -24,7 +19,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Resource
     private LoginInterceptor loginInterceptor;
 
-    //加载swagger的相关静态资源
+    //加载swagger等的相关静态资源
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("swagger-ui.html", "doc.html").addResourceLocations("classpath:/META-INF/resources/");
@@ -39,16 +34,13 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addInterceptor(loginInterceptor)
                 .addPathPatterns("/**")
                 // 放行静态资源
-                .excludePathPatterns("/static/**")
-                .excludePathPatterns("/css/**")
-                .excludePathPatterns("/images/**")
-                // 放行用户和管理端口的登录和注册问题
-                .excludePathPatterns("/**/login")
-                .excludePathPatterns("/**/signIn")
+                .excludePathPatterns("/static/**", "/css/**", "/images/**")
+                // 放行用户和管理端口的登录、登出、注册
+                .excludePathPatterns("/**/login", "/**/logout", "/**/signIn")
                 // 放行密码重置等相关接口
                 .excludePathPatterns("/user/verify", "/user/getVerifyCode", "/user/resetPwd")
                 // 放行swagger文档
-                .excludePathPatterns("/swagger-resources/**", "/webjars/**", "/v2/**", "/swagger-ui.html/**", "/doc.html");
+                .excludePathPatterns("/swagger-resources/**", "/webjars/**", "/v2/**", "/v3/**",  "/swagger-ui.html/**", "/doc.html");
     }
 
 

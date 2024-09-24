@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.comfort.hotel.mapper.WaiterMapper">
+
+<!-- 配置映射关系-->
+    <resultMap id="waiter_result_map" type="com.comfort.hotel.domain.dto.WaiterDTO">
+        <result column="waiter_id" property="waiterId"/>
+        <result column="waiter_cover" property="waiterCover"/>
+        <result column="waiter_name" property="waiterName"/>
+        <result column="gender" property="gender"/>
+        <result column="waiter_status" property="waiterStatus"/>
+        <result column="job_type" property="jobType"/>
+        <result column="waiter_positive_rating" property="waiterPositiveRating"/>
+        <result column="waiter_trump_up" property="waiterTrumpUp"/>
+        <result column="waiter_trump_down" property="waiterTrumpDown"/>
+        <result column="time_of_employment" property="timeOfEmployment"/>
+        <result column="last_office_time" property="lastOfficeTime"/>
+        <result column="last_day_off_time" property="lastDayOffTime"/>
+        <result column="last_fire_time" property="lastFireTime"/>
+    </resultMap>
+
+
+    <sql id="waiter_column_list">
+        w.`waiter_id`,
+        `waiter_cover`,
+        w.`waiter_name`,
+        w.`gender`,
+        `waiter_status`,
+        w.`job_type`,
+        `waiter_positive_rating`,
+        `waiter_trump_up`,
+        `waiter_trump_down`,
+        `time_of_employment`,
+        w.`last_office_time`,
+        `last_day_off_time`,
+        `last_fire_time`,
+    </sql>
+
+    <insert id="addWaiterInfo" parameterType="com.comfort.hotel.domain.dto.WaiterDTO">
+        insert into waiter
+        <set>
+            <if test="bean.waiterId != null">
+                waiter_id = #{bean.waiterId},
+            </if>
+            <if test="bean.waiterCover != null">
+                waiter_cover = #{bean.waiterCover},
+            </if>
+            <if test="bean.waiterName != null">
+                waiter_name = #{bean.waiterName},
+            </if>
+            <if test="bean.gender != null">
+                gender = #{bean.gender},
+            </if>
+            <if test="bean.jobType != null">
+                job_type = #{bean.jobType},
+            </if>
+        </set>
+    </insert>
+
+    <update id="updateWaiterInfo" parameterType="com.comfort.hotel.domain.dto.WaiterDTO">
+        update waiter
+        <set>
+            <if test="bean.waiterCover != null">
+                waiter_cover = #{bean.waiterCover},
+            </if>
+            <if test="bean.waiterName != null">
+                waiter_name = #{bean.waiterName},
+            </if>
+            <if test="bean.gender != null">
+                gender = #{bean.gender},
+            </if>
+            <if test="bean.jobType != null">
+                job_type = #{bean.jobType},
+            </if>
+            <if test="bean.waiterStatus != null">
+                waiter_status = #{bean.waiterStatus},
+            </if>
+            <if test="bean.lastOfficeTime != null">
+                last_office_time = #{bean.lastOfficeTime},
+            </if>
+            <if test="bean.lastDayOffTime != null">
+                last_day_off_time = #{bean.lastDayOffTime},
+            </if>
+            <if test="bean.lastFireTime != null">
+                last_fire_time = #{bean.lastFireTime},
+            </if>
+        </set>
+        where waiter_id = #{bean.waiterId}
+    </update>
+
+    <select id="selectWaiterList" resultMap="waiter_result_map">
+        select
+        <include refid="waiter_column_list"/>
+        GROUP_CONCAT(DISTINCT `user_name` SEPARATOR ', ') AS `service_objects`
+        from waiter w
+        left join user on user.waiter_id = w.waiter_id
+        <where>
+            <if test="keyword != null and keyword !=''">
+                and w.waiter_name like CONCAT('%', #{keyword}, '%')
+            </if>
+            <if test="jobTypes != null">
+                and w.job_type in
+                <foreach item="jobType" collection="jobTypes" open="(" separator="," close=")">
+                    #{jobType}
+                </foreach>
+            </if>
+        </where>
+        group by w.waiter_id
+        order by w.last_office_time desc
+    </select>
+    <select id="getWaiterCountByType" resultType="java.lang.Integer">
+        select count(1)
+        from waiter
+       <if test="types != null">
+           where job_type in
+           <foreach item="type" collection="types" open="(" separator="," close=")">
+               #{type}
+           </foreach>
+       </if>
+    </select>
+
+
+</mapper>

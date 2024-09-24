@@ -28,7 +28,7 @@ public class User implements Serializable {
     private String nickName;
 
     /** 用户账号，使用邮箱注册 */
-    private String qqEmail;
+    private String email;
 
     /** 密码,第一次赋初始化，稍后修改 */
     private String password;

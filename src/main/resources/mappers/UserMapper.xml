@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.comfort.hotel.mapper.UserMapper">
+
+<!--        配置映射关系-->
+    <resultMap id="user_result_map" type="com.comfort.hotel.domain.dto.UserDTO">
+        <result column="user_id" property="userId"/>
+        <result column="user_cover" property="userCover"/>
+        <result column="user_name" property="userName"/>
+        <result column="email" property="email"/>
+        <result column="sign_in_time" property="signInTime"/>
+        <result column="last_login_time" property="lastLoginTime"/>
+        <result column="id_card_code" property="idCardCode"/>
+        <result column="phone_number" property="phoneNumber"/>
+        <result column="spend_amount" property="spendAmount"/>
+        <result column="wechat_account" property="wechatAccount"/>
+        <result column="room_mark" property="roomMark"/>
+        <result column="user_status" property="userStatus"/>
+        <result column="pay_status" property="payStatus"/>
+    </resultMap>
+
+    <resultMap id="userPay_result_map" type="com.comfort.hotel.domain.dto.UserPayDTO">
+        <result column="user_name" property="userName"/>
+        <result column="spend_amount" property="fee"/>
+    </resultMap>
+
+    <sql id="user_column_list">
+        `user_id`,
+        `user_cover`,
+        `user_name`,
+        `email`,
+        `gender`,
+        `sign_in_time`,
+        `last_login_time`,
+        `id_card_code`,
+        `phone_number`,
+        `spend_amount`,
+        `wechat_account`,
+        `user_status`,
+        `pay_status`,
+    </sql>
+
+    <sql id="room_column_list">
+       r.`room_id`,
+      `room_cover`,
+       r.`room_info`,
+       `room_type`,
+       `room_status`,
+       `room_mark`,
+       `number_of_occupants`,
+       `book_time`,
+       `check_in_time`,
+       `check_out_time`,
+    </sql>
+
+
+
+    <select id="selectUserList" resultMap="user_result_map">
+       select
+           <include refid="user_column_list"/> `room_mark`
+       from user
+       left join room on user.room_id = room.room_id
+       <where>
+           <if test="keyword != null and keyword !=''">
+               AND (
+               user_name LIKE CONCAT('%', #{keyword}, '%')
+               OR email LIKE CONCAT('%', #{keyword}, '%')
+               OR id_card_code LIKE CONCAT('%', #{keyword}, '%')
+               OR room.room_mark LIKE CONCAT('%', #{keyword}, '%')
+               OR phone_number LIKE CONCAT('%', #{keyword}, '%')
+               OR wechat_account LIKE CONCAT('%', #{keyword}, '%')
+               )
+           </if>
+       </where>
+   </select>
+    <select id="distinguishUserByCondition" resultType="java.lang.Integer">
+        select count(1)
+        from user
+        <if test="status == 0 ">
+            where gender = #{type}
+        </if>
+        <if test="status == 1 ">
+            where user_status = #{type}
+        </if>
+        <if test="status == 2 ">
+            where pay_status = #{type}
+        </if>
+    </select>
+
+    <select id="getUserDifferentPaySituation" resultMap="userPay_result_map">
+        select `user_name`,`spend_amount`
+        from user
+        <if test="status != null">
+            where `pay_status` = #{status}
+        </if>
+        order by `spend_amount` desc
+        limit 5
+    </select>
+
+
+</mapper>

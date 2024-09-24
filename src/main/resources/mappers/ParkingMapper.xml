@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.comfort.hotel.mapper.ParkingMapper">
+
+<!-- 配置映射关系-->
+    <resultMap id="parking_result_map" type="com.comfort.hotel.domain.dto.CarDTO">
+        <result column="parking_id" property="parkingId"/>
+        <result column="car_cover" property="carCover"/>
+        <result column="car_owner_name" property="carOwnerName"/>
+        <result column="car_owner_contact" property="carOwnerContact"/>
+        <result column="car_status" property="carStatus"/>
+        <result column="cumulative_cost" property="cumulativeCost"/>
+        <result column="last_parking_time" property="lastParkingTime"/>
+        <result column="last_leave_time" property="lastLeaveTime"/>
+    </resultMap>
+
+
+    <sql id="parking_column_list">
+       p.`parking_id`,
+       `car_cover`,
+       `car_status`,
+       `cumulative_cost`,
+       `last_parking_time`,
+       `last_leave_time`,
+    </sql>
+
+
+    <update id="updateCarParkingInfo" parameterType="com.comfort.hotel.domain.dto.CarDTO">
+        update parking
+        <set>
+            <if test="bean.carCover != null">
+                car_cover = #{bean.carCover},
+            </if>
+            <if test="bean.carStatus != null">
+                car_status = #{bean.carStatus},
+            </if>
+            <if test="bean.cumulativeCost != null">
+                cumulative_cost = #{bean.cumulativeCost},
+            </if>
+            <if test="bean.lastParkingTime != null">
+                last_parking_time = #{bean.lastParkingTime},
+            </if>
+            <if test="bean.lastLeaveTime != null">
+                last_leave_time = #{bean.lastLeaveTime},
+            </if>
+        </set>
+        where parking_id = #{bean.parkingId}
+    </update>
+
+    <select id="selectParkingCarList" resultMap="parking_result_map">
+        select
+        <include refid="parking_column_list"/>
+        user.user_name  AS `car_owner_name`,
+        user.phone_number AS `car_owner_contact`
+        from parking p
+        left join user on user.parking_id = p.parking_id
+        <where>
+            <if test="keyword != null and keyword != ''">
+            AND (
+            user.user_name LIKE CONCAT('%', #{keyword}, '%')
+            OR user.phone_number LIKE CONCAT('%', #{keyword}, '%')
+            )
+            </if>
+        </where>
+        order by p.cumulative_cost desc
+    </select>
+</mapper>

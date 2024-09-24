@@ -2,6 +2,8 @@ package com.comfort.hotel.utils;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 
+import java.util.Base64;
+
 /**
  * @Author: ayuan
  * @PS:
@@ -45,6 +47,15 @@ public class StringTools {
         }
         fileName = fileName.substring(0, index);
         return fileName;
+    }
+
+    //转base64码
+    public static String encodeUserNameToBase64(String userName) {
+        if (userName == null) {
+            return null;
+        }
+        byte[] userNameBytes = userName.getBytes(java.nio.charset.StandardCharsets.UTF_8);
+        return Base64.getEncoder().encodeToString(userNameBytes);
     }
 
     // 随机生成字符串

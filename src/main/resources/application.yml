@@ -48,7 +48,15 @@ spring:
 # mybatis
 mybatis:
   mapper-locations: classpath:mappers/*xml
-  type-aliases-package: com.comfort.hotel.domain.entity
+  type-aliases-package: com.comfort.hotel.domain
+
+aliyun:
+  oss:
+    end-point: oss-cn-beijing.aliyuncs.com
+    access-key-id: ACCESS_KEY_REDACTED
+    access-key-secret: ACCESS_KEY_REDACTED
+    bucket-name: hotel-sys-ayuan
+
 
 # 服务端口
 server:

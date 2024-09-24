@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.comfort.hotel.mapper.GoodsMapper">
+
+<!-- 配置映射关系-->
+    <resultMap id="goods_result_map" type="com.comfort.hotel.domain.dto.GoodsDTO">
+        <result column="goods_id" property="goodsId"/>
+        <result column="goods_cover" property="goodsCover"/>
+        <result column="goods_name" property="goodsName"/>
+        <result column="goods_type" property="goodsType"/>
+        <result column="goods_status" property="goodsStatus"/>
+        <result column="goods_info" property="goodsInfo"/>
+        <result column="product_time" property="productTime"/>
+        <result column="expire_time" property="expireTime"/>
+        <result column="positive_rating" property="positiveRating"/>
+        <result column="goods_trump_up" property="goodsTrumpUp"/>
+        <result column="goods_trump_down" property="goodsTrumpDown"/>
+    </resultMap>
+
+
+    <sql id="goods_column_list">
+          `goods_id`,
+          `goods_cover`,
+          `goods_name`,
+          `price`,
+          `goods_type`,
+          `goods_status`,
+          `goods_info`,
+          `expire_time`,
+          `product_time`,
+          `positive_rating`,
+          `goods_trump_up`,
+          `goods_trump_down`
+    </sql>
+
+    <insert id="addGoodsInfo">
+        insert into goods
+        <set>
+            <if test="bean.goodsId != null">
+                goods_id = #{bean.goodsId},
+            </if>
+            <if test="bean.goodsCover != null">
+                goods_cover = #{bean.goodsCover},
+            </if>
+            <if test="bean.goodsName != null and bean.goodsName !='' ">
+                goods_name = #{bean.goodsName},
+            </if>
+            <if test="bean.price != null and bean.price !='' ">
+                price = #{bean.price},
+            </if>
+            <if test="bean.goodsType != null">
+                goods_type = #{bean.goodsType},
+            </if>
+            <if test="bean.goodsStatus != null">
+                goods_status = #{bean.goodsStatus},
+            </if>
+            <if test="bean.goodsInfo != null and bean.goodsInfo != ''">
+                goods_info = #{bean.goodsInfo},
+            </if>
+            <if test="bean.productTime != null">
+                product_time = #{bean.productTime},
+            </if>
+            <if test="bean.expireTime != null">
+                expire_time = #{bean.expireTime},
+            </if>
+        </set>
+    </insert>
+
+    <update id="updateGoodsInfo">
+        update goods
+        <set>
+            <if test="bean.goodsCover != null">
+                goods_cover = #{bean.goodsCover},
+            </if>
+            <if test="bean.goodsName != null and bean.goodsName !='' ">
+                goods_name = #{bean.goodsName},
+            </if>
+            <if test="bean.price != null and bean.price !='' ">
+                price = #{bean.price},
+            </if>
+            <if test="bean.goodsType != null">
+                goods_type = #{bean.goodsType},
+            </if>
+            <if test="bean.goodsStatus != null">
+                goods_status = #{bean.goodsStatus},
+            </if>
+            <if test="bean.goodsInfo != null and bean.goodsInfo != ''">
+                goods_info = #{bean.goodsInfo},
+            </if>
+            <if test="bean.productTime != null">
+                product_time = #{bean.productTime},
+            </if>
+            <if test="bean.expireTime != null">
+                expire_time = #{bean.expireTime},
+            </if>
+        </set>
+        where goods_id = #{bean.goodsId}
+    </update>
+
+
+    <select id="selectGoodsList" resultMap="goods_result_map">
+        select
+        <include refid="goods_column_list"/>
+        from goods
+        <where>
+            <if test="keyword != null and keyword != ''">
+            AND (
+            goods_name LIKE CONCAT('%', #{keyword}, '%')
+            OR price LIKE CONCAT('%', #{keyword}, '%')
+            OR goods_info LIKE CONCAT('%', #{keyword}, '%')
+            OR product_time LIKE CONCAT('%', #{keyword}, '%')
+            OR expire_time LIKE CONCAT('%', #{keyword}, '%')
+            )
+            </if>
+        </where>
+        order by positive_rating desc
+    </select>
+</mapper>

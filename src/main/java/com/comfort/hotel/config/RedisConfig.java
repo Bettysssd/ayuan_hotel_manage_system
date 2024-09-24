@@ -1,6 +1,7 @@
 package com.comfort.hotel.config;
 
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
@@ -11,6 +12,7 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
  * @PS: 自定义redis模板
  * @Date: 2024/9/3 15:42
  */
+@Configuration
 public class RedisConfig {
 
     // 自定义模板，然后交给springboot进行管理，解决了可视化窗口乱码的问题

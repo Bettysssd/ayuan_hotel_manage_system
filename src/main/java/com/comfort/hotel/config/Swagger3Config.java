@@ -35,8 +35,8 @@ public class Swagger3Config {
 
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
-                .title("酒店管理系统swagger文档")
-                .description("酒店管理系统swagger文档")
+                .title("悦居酒店管理系统swagger文档")
+                .description("悦居酒店管理系统swagger文档")
                 .version("1.0.0")
                 .contact(new Contact("ayuan", "https://gitee.com/hangtianRange", "18319720112@163.com"))
                 .termsOfServiceUrl("https://i.csdn.net/#/user-center/profile?spm=1000.2115.3001.5111")

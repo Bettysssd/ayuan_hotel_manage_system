@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.comfort.hotel.mapper.CanteenMapper">
+
+<!-- 配置映射关系-->
+    <resultMap id="canteen_result_map" type="com.comfort.hotel.domain.dto.CanteenDTO">
+        <result column="canteen_id" property="canteenId"/>
+        <result column="canteen_cover" property="canteenCover"/>
+        <result column="canteen_name" property="canteenName"/>
+        <result column="canteen_flavor_type" property="canteenFlavorType"/>
+        <result column="canteen_table_status" property="canteenTableStatus"/>
+        <result column="canteen_open_status" property="canteenOpenStatus"/>
+        <result column="canteen_number_of_diners" property="canteenNumberOfDiners"/>
+        <result column="canteen_total_tables" property="canteenTotalTables"/>
+        <result column="canteen_current_available_tables" property="canteenCurrentAvailableTables"/>
+        <result column="canteen_introduce" property="canteenIntroduce"/>
+        <result column="canteen_offer_food" property="canteenOfferFood"/>
+        <result column="canteen_open_time" property="canteenOpenTime"/>
+        <result column="canteen_closed_time" property="canteenClosedTime"/>
+        <result column="canteen_rating" property="canteenRating"/>
+        <result column="canteen_trump_up" property="canteenTrumpUp"/>
+        <result column="canteen_trump_down" property="canteenTrumpDown"/>
+    </resultMap>
+
+
+    <sql id="canteen_column_list">
+          `canteen_id`,
+          `canteen_cover`,
+          `canteen_name`,
+          `canteen_flavor_type`,
+          `canteen_table_status`,
+          `canteen_open_status`,
+          `canteen_number_of_diners`,
+          `canteen_total_tables`,
+          `canteen_introduce`,
+          `canteen_offer_food`,
+          `canteen_open_time`,
+          `canteen_closed_time`,
+          `canteen_rating`,
+          `canteen_trump_up`,
+          `canteen_trump_down`,
+    </sql>
+    <insert id="addCanteenInfo">
+        insert into canteen
+        <set>
+            <if test="bean.canteenId != null">
+                canteen_id = #{bean.canteenId},
+            </if>
+            <if test="bean.canteenCover != null">
+                canteen_cover = #{bean.canteenCover},
+            </if>
+            <if test="bean.canteenName != null">
+                canteen_name = #{bean.canteenName},
+            </if>
+            <if test="bean.canteenFlavorType != null">
+                canteen_flavor_type = #{bean.canteenFlavorType},
+            </if>
+            <if test="bean.canteenOpenStatus != null">
+                canteen_open_status = #{bean.canteenOpenStatus},
+            </if>
+            <if test="bean.canteenIntroduce != null and bean.canteenIntroduce != ''">
+                canteen_introduce = #{bean.canteenIntroduce},
+            </if>
+            <if test="bean.canteenNumberOfDiners != null">
+                canteen_number_of_diners = #{bean.canteenNumberOfDiners},
+            </if>
+            <if test="bean.canteenTotalTables != null">
+                canteen_total_tables = #{bean.canteenTotalTables},
+            </if>
+            <if test="bean.canteenOfferFood != null and bean.canteenOfferFood != ''" >
+                canteen_offer_food = #{bean.canteenOfferFood},
+            </if>
+            <if test="bean.canteenOpenTime != null">
+                canteen_open_time = #{bean.canteenOpenTime},
+            </if>
+            <if test="bean.canteenClosedTime != null">
+                canteen_closed_time = #{bean.canteenClosedTime},
+            </if>
+        </set>
+    </insert>
+
+    <update id="updateCanteenInfo">
+        update canteen
+        <set>
+            <if test="bean.canteenCover != null">
+                canteen_cover = #{bean.canteenCover},
+            </if>
+            <if test="bean.canteenName != null">
+                canteen_name = #{bean.canteenName},
+            </if>
+            <if test="bean.canteenFlavorType != null">
+                canteen_flavor_type = #{bean.canteenFlavorType},
+            </if>
+            <if test="bean.canteenOpenStatus != null">
+                canteen_open_status = #{bean.canteenOpenStatus},
+            </if>
+            <if test="bean.canteenNumberOfDiners != null">
+                canteen_number_of_diners = #{bean.canteenNumberOfDiners},
+            </if>
+            <if test="bean.canteenTotalTables != null">
+                canteen_total_tables = #{bean.canteenTotalTables},
+            </if>
+            <if test="bean.canteenIntroduce != null and bean.canteenIntroduce != ''">
+                canteen_introduce = #{bean.canteenIntroduce},
+            </if>
+            <if test="bean.canteenOfferFood != null and bean.canteenOfferFood != ''">
+                canteen_offer_food = #{bean.canteenOfferFood},
+            </if>
+            <if test="bean.canteenOpenTime != null">
+                canteen_open_time = #{bean.canteenOpenTime},
+            </if>
+            <if test="bean.canteenClosedTime != null">
+                canteen_closed_time = #{bean.canteenClosedTime},
+            </if>
+        </set>
+        where canteen_id = #{bean.canteenId}
+    </update>
+
+
+    <select id="selectCanteenList" resultMap="canteen_result_map">
+        select
+        <include refid="canteen_column_list"/>
+            CASE
+                WHEN canteen_total_tables - canteen_number_of_diners > 0 THEN canteen_total_tables - canteen_number_of_diners
+                ELSE NULL  -- 或者NULL，取决于你的业务逻辑
+            END AS `canteen_current_available_tables`
+        from canteen
+        <where>
+            <if test="keyword != null and keyword != ''">
+            AND (
+            canteen_name LIKE CONCAT('%', #{keyword}, '%')
+            OR canteen_introduce LIKE CONCAT('%', #{keyword}, '%')
+            OR canteen_offer_food LIKE CONCAT('%', #{keyword}, '%')
+            )
+            </if>
+        </where>
+        order by canteen_open_status desc
+    </select>
+</mapper>

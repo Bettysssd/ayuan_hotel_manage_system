@@ -11,7 +11,7 @@ import lombok.Data;
 public class UserLoginDTO {
 
     // 账号
-    private String qqEmail;
+    private String email;
 
     // 密码
     private String password;

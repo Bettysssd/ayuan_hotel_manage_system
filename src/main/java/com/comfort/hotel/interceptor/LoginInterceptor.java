@@ -1,21 +1,14 @@
 package com.comfort.hotel.interceptor;
 
 import com.comfort.hotel.constants.Constants;
-
-
-import org.springframework.context.annotation.Bean;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
-import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
-import org.springframework.web.servlet.ModelAndView;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
+import java.util.Objects;
 
 
 /**
@@ -29,8 +22,7 @@ public class LoginInterceptor implements HandlerInterceptor {
 
 
     @Resource
-    RedisTemplate<String,String> redisTemplate;
-
+    RedisTemplate<String, String> redisTemplate;
 
 
     @Override
@@ -41,26 +33,16 @@ public class LoginInterceptor implements HandlerInterceptor {
         if (!(handler instanceof HandlerMethod)) {
             return true;
         }
+
         // 获取登录后的session
-        String token = (String)  request.getSession().getAttribute(Constants.TOKEN);
-        String cachedToken = redisTemplate.opsForValue().get(Constants.USER_ID);
-        if (token == null || cachedToken != null && !cachedToken.equals(token)) {
-            // 未登录，返回 false 阻止请求继续处理
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);  // 设置状态码为 401 Unauthorized
+        String token = request.getHeader("Authorization");
+        // 如果当前token有效的是用户或管理员
+        if (Objects.equals(redisTemplate.opsForValue().get(Constants.USER_TOKEN), token) ||
+                Objects.equals(redisTemplate.opsForValue().get(Constants.SUPERVISOR_TOKEN), token)) {
+            return true;
+        }else {
+            response.setHeader(Constants.NOTICE_INFO,"unable");
             return false;
         }
-      return true;
-    }
-
-    //Controller逻辑执行完毕但是视图解析器还未进行解析之前
-    @Override
-    public void postHandle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o, ModelAndView modelAndView) throws Exception {
-        System.out.println("postHandle....");
-    }
-
-    //Controller逻辑和视图解析器执行完毕
-    @Override
-    public void afterCompletion(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o, Exception e) throws Exception {
-        System.out.println("afterCompletion....");
     }
 }
