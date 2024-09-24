@@ -19,7 +19,7 @@
         <h2 style="text-align: center;">悦居酒店管理系统</h2>
         <form @submit.prevent> 
           <div class="inputBx">
-            <input id="account" type="text" v-model="userFormData.qqEmail" required="required">
+            <input id="account" type="text" @blur="validateEmail" v-model="userFormData.email" required="required">
             <span>账号：</span>
             <i class="fas fa-user-circle"></i>
           </div>
@@ -30,7 +30,7 @@
             <i class="fas fa-key"></i>
           </div>
           <div class="inputBx">
-            <input type="submit" value="用户登录"  @click="login(1)"  style="margin-right: 15px;">
+            <input type="submit" value="用户登录"  @click="login(1)"  style="margin-right: 60px;">
             <input type="submit" value="管理员登录" @click="login(0)"> 
           </div>
         </form>
@@ -50,7 +50,7 @@
           <h2 style="text-align: center;" >您好，请注册！</h2>
       <form  @submit.prevent="signIn">
         <div class="inputBx">
-          <input type="text" v-model="userFormData.qqEmail"  required="required">
+          <input type="text" v-model="userFormData.email" @blur="validateEmail" required="required">
           <span>请输入邮箱号码：</span>
           <i class="fas fa-user-circle"></i>
         </div>
@@ -61,7 +61,7 @@
            <i class="fas fa-key"></i>
         </div>
         <div class="inputBx">
-          <input type="submit" value="注册">
+          <input type="submit" style="margin-left: 74px;" value="注册">
         </div>
       </form>
       <p> <a href="javascript:void(0)" @click="showPanel(1)">已有账号，登录?</a> </p>
@@ -77,7 +77,7 @@
           <h2 style="text-align: center;" >请验证是你本人操作！</h2>
         <form  @submit.prevent="getAndVerify">
           <div class="inputBx">
-            <input type="text" id="identify" v-model="userFormData.qqEmail" required="required">
+            <input type="text" id="identify" v-model="userFormData.email" @blur="validateEmail" required="required">
             <span>请输入邮箱号码：</span>
             <i class="fas fa-user-circle"></i>
           </div>
@@ -86,7 +86,7 @@
             <span>请输入验证码：</span>
           </div>
           <div class="inputBx">
-            <input type="submit" value="验证"  >
+            <input type="submit" style="margin-left: 74px;" value="验证"  >
           </div>
           <p> 
             <span v-if="isSending">验证码已发送，{{ secondsLeft }}秒后可重新发送</span>
@@ -108,8 +108,8 @@
         <h2 style="text-align: center;" >您好，请重置密码！</h2>
       <form  @submit.prevent="resetPwd">
         <div class="inputBx">
-          <input type="text" id="qqEmail" v-model="userFormData.qqEmail" required="required">
-          <span>请输入QQ邮箱: </span>
+          <input type="text" id="email" v-model="userFormData.email" @blur="validateEmail" required="required">
+          <span>请输入邮箱号码：: </span>
           <i class="fas fa-user-circle"></i>
         </div>
         <div class="inputBx password">
@@ -119,7 +119,7 @@
            <i class="fas fa-key"></i>
         </div>
         <div class="inputBx">
-          <input type="submit" value="重置密码"  >
+          <input type="submit" style="margin-left: 74px;" value="重置密码"  >
         </div>
       </form>
       <p> <a href="javascript:void(0)" @click="showPanel(1)">返回登录?</a> </p>
@@ -136,12 +136,14 @@
 <script setup>  
 
 
-import { reactive, ref, onUnmounted } from "vue";
+import { reactive, ref, onUnmounted, onMounted } from "vue";
 import axios from 'axios'
 import { useRouter } from "vue-router";
 import { ElMessage } from 'element-plus';
 
 
+
+const emailError = ref(null)
 const isSending = ref(false);
 const secondsLeft = ref(0);
 let intervalId = null; // 用于存储setInterval的ID
@@ -149,8 +151,9 @@ const loading = ref(false);
 const router = useRouter();
 const opType = ref(1);
 const formDataRef = ref();
+const status = ref(null)
 const userFormData = reactive({
-  qqEmail: '',
+  email: '',
   password: '',
   verifyCode: ''
 })
@@ -167,6 +170,16 @@ const cleanup = () => {
 
 onUnmounted(cleanup);
 
+
+// 校验邮箱账号格式
+function validateEmail() {
+   const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // 简单的邮箱格式校验正则表达式
+      if (!emailPattern.test(userFormData.email)) {
+        status.value = false;
+      } else {
+        status.value = true;
+      }
+}
 // 业务提示框弹出
 const notice = ($content) => {
   ElMessage({
@@ -198,7 +211,12 @@ const startCountdown = (duration) => {
 
 // 获取验证码
 const getVerifyCode = () => {
-   if (userFormData.qqEmail) {
+   // 判断邮箱是否校验无误
+  if (!status.value) {
+    errorNotice('请输入有效的邮箱地址')
+      return;
+  }
+   if (userFormData.email) {
       loading.value = true;
       axios.post('/api/user/getVerifyCode', userFormData)
         .then(response => {
@@ -226,7 +244,12 @@ const getVerifyCode = () => {
 
 // 验证操作者是否为本人
 const getAndVerify = () => {
-  if (opType.value == 3 && userFormData.qqEmail && userFormData.verifyCode) {
+   // 判断邮箱是否校验无误
+  if (!status.value) {
+    errorNotice('请输入有效的邮箱地址')
+    return;
+  }
+  if (opType.value == 3 && userFormData.email && userFormData.verifyCode) {
     loading.value = true;
     axios.post('/api/user/verify', userFormData)
     .then(response => {
@@ -246,7 +269,12 @@ const getAndVerify = () => {
 
 // 重置用户密码
 const resetPwd = () => {
-  if (opType.value == 0 && userFormData.qqEmail && userFormData.password) {
+   // 判断邮箱是否校验无误
+  if (!status.value) {
+    errorNotice('请输入有效的邮箱地址')
+      return;
+  }
+  if (opType.value == 0 && userFormData.email && userFormData.password) {
     loading.value = true;
     axios.post('/api/user/resetPwd', userFormData)
     .then(response => {
@@ -266,7 +294,12 @@ const resetPwd = () => {
 
   // 注册
 const signIn = () => {
-  if (opType.value == 2 && userFormData.qqEmail && userFormData.password) {
+   // 判断邮箱是否校验无误
+  if (!status.value) {
+    errorNotice('请输入有效的邮箱地址')
+      return;
+  }
+  if (opType.value == 2 && userFormData.email && userFormData.password) {
     loading.value = true;
     axios.post('/api/user/signIn', userFormData)
     .then(response => {
@@ -284,20 +317,47 @@ const signIn = () => {
   }
 }
 
+// base64解码
+function decodeBase64UserName(encodedUserName) {
+    try {
+        // 尝试解码Base64编码的字符串
+        var decodedBytes = atob(encodedUserName);
+        // 将解码后的字节（实际上是UTF-8编码的字符串）转换为JavaScript字符串
+        var decodedUserName = decodeURIComponent(escape(decodedBytes)); // 这种方法通常用于处理特殊字符，但在这里可能不是必需的，除非你知道编码的字符串包含需要额外处理的字符
+        // 注意：上面的decodeURIComponent(escape(...))组合在某些情况下可能不是必需的，并且可能因浏览器而异。
+        // 对于简单的Base64 UTF-8字符串，通常只需要atob()就足够了。
+
+        // 直接返回解码后的用户名
+        return decodedUserName;
+    } catch (e) {
+        // 处理解码过程中可能出现的错误（例如，如果输入不是有效的Base64编码）
+        console.error('Failed to decode Base64 string:', e);
+        return null; // 或者返回一个错误消息、抛出一个错误等
+    }
+}
+
+
 
 // 登录
 const login = (isUserType) => {
-  if (opType.value == 1 && userFormData.qqEmail && userFormData.password) {
+  // 判断邮箱是否校验无误
+  if (!status.value) {
+    errorNotice('请输入有效的邮箱地址')
+      return;
+  }
+  if (opType.value == 1 && userFormData.email && userFormData.password) {
     // 用户登录
     if (isUserType === 1) {
       loading.value = true;
       axios.post('/api/user/login', userFormData)
         .then(response => {
           loading.value = false;
-          // 登录成功，设置登录状态
-          sessionStorage.setItem('isLoggedIn', 'true');
+          // 设置用户token
+          localStorage.setItem('userToken',response.headers["usertoken"]);
+          // 设置用户昵称
+          localStorage.setItem('userName',decodeBase64UserName(response.headers["username"]));
           // 路由跳转
-          router.push('/userLogin');
+          router.push('/user');
           })
           .catch(error => {
             // 处理错误响应
@@ -307,16 +367,19 @@ const login = (isUserType) => {
           });
     } else {
       // 管理员登录
-      supervisorFormData.account = userFormData.qqEmail;
+      supervisorFormData.account = userFormData.email;
       supervisorFormData.password = userFormData.password;
       loading.value = true;
       axios.post('/api/supervisor/login', supervisorFormData)
         .then(response => {
           loading.value = false;
-          // 登录成功，设置登录状态
-          sessionStorage.setItem('isLoggedIn', 'true');
+          console.log(response.headers)
+          // 设置管理员token
+          localStorage.setItem('supervisorToken',response.headers["supervisortoken"]);
+          // 设置管理员昵称
+          localStorage.setItem('supervisorName',decodeBase64UserName(response.headers["supervisorname"]));
           // 路由跳转
-          router.push('/supervisorLogin');
+          router.push('/supervisor');
           })
           .catch(error => {
             // 处理错误响应
@@ -337,7 +400,7 @@ const showPanel = (type) => {
 }
 
 const restForm = () => {
-  userFormData.qqEmail = '',
+  userFormData.email = '',
   userFormData.password = '',
   userFormData.verifyCode = '',
   supervisorFormData.account = '',

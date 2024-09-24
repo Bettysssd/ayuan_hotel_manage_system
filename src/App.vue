@@ -1,11 +1,9 @@
 <script setup>
-import axios from 'axios'
-import Login from './Login.vue'
 
 </script>
 
 <template>
-   <router-view></router-view>
+ <router-view/>  
 </template>
   
 <style scoped>
