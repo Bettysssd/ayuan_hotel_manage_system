@@ -304,9 +304,13 @@ const signIn = () => {
     axios.post('/api/user/signIn', userFormData)
     .then(response => {
       loading.value = false;
+      if (response.data.msg != null) {
+        errorNotice(response.data.msg);
+        return;
+      }
         // 处理成功响应
       notice("注册成功，请点击后进行登录");    
-      showPanel(0); 
+      showPanel(1); 
       })
       .catch(error => {
         loading.value = false;
@@ -356,6 +360,8 @@ const login = (isUserType) => {
           localStorage.setItem('userToken',response.headers["usertoken"]);
           // 设置用户昵称
           localStorage.setItem('userName',decodeBase64UserName(response.headers["username"]));
+          // 设置用户id
+          localStorage.setItem('userId', response.headers["userid"])
           // 路由跳转
           router.push('/user');
           })

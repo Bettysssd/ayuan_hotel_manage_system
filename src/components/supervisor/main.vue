@@ -10,8 +10,6 @@
                    default-active="0"
                     class="el-menu-vertical-demo"
                     :collapse="isCollapse"
-                    @open="handleOpen"
-                    @close="handleClose"
                   >
                   <el-menu-item index="0" @click="goToVariableGraphics">
                     <el-icon><HelpFilled /></el-icon>
@@ -153,6 +151,7 @@ const supervisorName = ref();
 // 页面加载时，自动绑定管理员的姓名
 onMounted(() => {
   supervisorName.value = localStorage.getItem('supervisorName');
+  goToVariableGraphics();
 });
 
 
@@ -222,16 +221,10 @@ const goToParkingManagement = () => {
    router.push('/supervisor/manageParking');
 } 
 
-onMounted(goToVariableGraphics)
+
 
 
 const isCollapse = ref(true)
-const handleOpen = (key: string, keyPath: string[]) => {
-  console.log(key, keyPath)
-}
-const handleClose = (key: string, keyPath: string[]) => {
-  console.log(key, keyPath)
-}
 
 const logout = () => {
     axios.get('/api/supervisor/logout')

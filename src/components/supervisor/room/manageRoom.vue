@@ -25,7 +25,7 @@
     <el-table-column align="center" label="客房房间号" prop="roomMark" width="120" />
     <el-table-column align="center" label="客房好评率"  width="120">
           <template #default="scope">
-          <span v-if="scope.row.roomRating != null"> {{ scope.row.roomRating + "%" }} </span>
+          <span v-if="scope.row.roomRating != null"> {{ (scope.row.roomRating * 100) + "%" }} </span>
         </template>
     </el-table-column>
     <el-table-column align="center" label="客房好评数目" prop="roomTrumpUp"  width="100"/>
@@ -56,7 +56,6 @@
             color="#626aef" :dark="isDark" plain size="small" @click="handleEdit(scope.$index, scope.row)">
           编辑
         </el-button>
-      
         <el-button
           style="margin-left: 10px;"
           size="small"
@@ -100,6 +99,7 @@
    <el-dialog v-model="dialogAddVisible" title="录入客房信息"  :width="550" :height="300">
         <el-form ref="ruleFormRef" :rules="rules" :model="roomEditInfo"  >
         <el-form-item label="客房图片" :label-width="formLabelWidth">
+           <el-tooltip class="item" effect="dark" content="点击录入客房图片" placement="top">
           <el-upload
            class="avatar-uploader"
            action="http://localhost:8081/api/supervisor/uploadRoomCover"
@@ -111,13 +111,14 @@
               <img v-if="roomEditInfo.roomCover" :src="roomEditInfo.roomCover" class="avatar" style="width: 40px; height: 40px;" />
                <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
             </div>
-          </el-upload>
+           </el-upload>
+          </el-tooltip> 
         </el-form-item>
         <el-form-item label="客房介绍" :label-width="formLabelWidth" prop="roomInfo" >
-         <el-input v-model="roomEditInfo.roomInfo" autocomplete="off" type="textarea"/>
+         <el-input placeholder="请输入......" v-model="roomEditInfo.roomInfo" autocomplete="off" type="textarea"/>
         </el-form-item>
         <el-form-item label="客房类型" :label-width="formLabelWidth" prop="roomType">
-         <el-select v-model="roomEditInfo.roomType">
+         <el-select v-model="roomEditInfo.roomType" placeholder="请选择">
               <el-option :label="`家庭间`" :value="5"> 家庭间 </el-option>
               <el-option :label="`豪华双人间`" :value="4"> 豪华双人间 </el-option>
               <el-option :label="`豪华单人间`" :value="3"> 豪华单人间 </el-option>
@@ -126,10 +127,10 @@
          </el-select>
         </el-form-item>
          <el-form-item label="客房房间号" :label-width="formLabelWidth" prop="roomMark" >
-         <el-input v-model="roomEditInfo.roomMark" autocomplete="off" />
+         <el-input placeholder="例: 18楼1818房" v-model="roomEditInfo.roomMark" autocomplete="off" />
         </el-form-item>
          <el-form-item label="入住人数" :label-width="formLabelWidth"  prop="numberOfOccupants">
-         <el-select v-model="roomEditInfo.numberOfOccupants">
+         <el-select v-model="roomEditInfo.numberOfOccupants" placeholder="请选择">
               <el-option v-if="roomEditInfo.roomType === 5" :label="`五人`" :value="5"> 五人 </el-option>
               <el-option v-if="roomEditInfo.roomType === 5" :label="`四人`" :value="4"> 四人 </el-option>
               <el-option v-if="roomEditInfo.roomType === 5" :label="`三人`" :value="3"> 三人 </el-option>
@@ -156,6 +157,7 @@
    <el-dialog v-model="dialogUpdateVisible" title="更新客房信息"  :width="550" :height="300">
         <el-form ref="ruleFormRef" :rules="rules" :model="roomEditInfo" >
         <el-form-item label="客房图片" :label-width="formLabelWidth">
+           <el-tooltip class="item" effect="dark" content="点击更换客房图片" placement="top">
           <el-upload
            class="avatar-uploader"
            action="http://localhost:8081/api/supervisor/uploadRoomCover"
@@ -166,6 +168,7 @@
               <img :src="roomEditInfo.roomCover"  style="width: 40px; height: 40px;" />
             </div>
           </el-upload>
+           </el-tooltip>
         </el-form-item>
         <el-form-item label="客房介绍" :label-width="formLabelWidth" prop="roomInfo"  >
          <el-input v-model="roomEditInfo.roomInfo" autocomplete="off"  type="textarea"/>
@@ -280,6 +283,16 @@ const rules = reactive<FormRules<Room>>({
   roomInfo: [
     { required: true, message: '客房介绍不能为空', trigger: 'blur' },
     { min: 1, max: 200, message: '字符长度应该在1到200之间', trigger: 'change' },
+    {
+        validator: (rule, value, callback) => {
+            if (value && value.includes(' ')) {
+                callback(new Error('客房介绍中不能包含空格'));
+            } else {
+                callback();
+            }
+        },
+        trigger: 'change'
+    }
   ],
   
   roomType: [
@@ -290,6 +303,16 @@ const rules = reactive<FormRules<Room>>({
   ],
   roomMark: [
     { required: true, message: '客房房间号不能为空', trigger: 'blur' },
+    {
+        validator: (rule, value, callback) => {
+            if (value && value.includes(' ')) {
+                callback(new Error('客房房间号中不能包含空格'));
+            } else {
+                callback();
+            }
+        },
+        trigger: 'change'
+    }
   ],
   price: [
     { required: true, message: '客房租金不能为空', trigger: 'blur' },
@@ -429,7 +452,7 @@ function fetchData(newPage: number) {
   loadDataList();
 }
 
-// 加载用户数据
+// 加载房间数据
 const loadDataList = async () => {
     try {  
     const response = await axiosInstance.post(`/api/supervisor/queryRoomList`, query);

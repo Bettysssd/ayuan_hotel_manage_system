@@ -38,7 +38,7 @@
   </el-table-column>
 
 
-    <el-table-column  fixed="right" align="center" label="操作" width="220" >
+    <el-table-column  fixed="right" align="center" label="操作" width="130" >
       
       <template #default="scope">
         <div style="display: flex; justify-content: space-between;  align-items: center">
@@ -55,17 +55,6 @@
           @click="handleUserStatus(scope.$index, scope.row)"
         >
             <span>{{ scope.row.userStatus === 1 ? '停用' : '启用' }}</span>
-        </el-button>
-
-        <el-button
-          style="margin-left: 10px;"
-          size="small"
-          color="#008000"
-          :dark="isDark" plain
-          @click="noticeUserPay(scope.$index, scope.row)"
-          v-bind:disabled="scope.row.payStatus === 1"
-        >
-            <span>提醒付款</span>
         </el-button>
         </div>
       </template>
@@ -209,6 +198,7 @@ const loadDataList = async () => {
      axiosInstance.post(`/api/supervisor/queryUserList`, query )  
     .then(response => {
       // 判断token是否无效或过期
+      console.log(response);
     if (response.headers['notice'] === 'unable') {
         noticeError("当前token过期或无效,请重新登录");
         // 移除原有的token
@@ -290,29 +280,6 @@ async function handleUserStatus(index: number, row: any) {
         // 在修改后刷新数据
         loadDataList();
       })
-  }
-}
-// 修改用户状态逻辑处理
-async function noticeUserPay  (index: number, row: User) {
-   const result = await ElMessageBox.confirm('确认提醒当前用户付款吗？', '提示', {
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
-    type: 'warning'
-  });
-
-  if (result) {
-    const userStatusInfo = reactive({
-      userId: row.userId,
-      userStatus: row.userStatus === 1 ? 0 : 1
-    });
-
-    // 使用webscokect提示用户-- 待实现 manageUser 308
-  //   await axiosInstance.post(`/api/supervisor/changeUserStatus`, userStatusInfo)
-  //     .then(response => {
-  //       notice("修改当前用户状态成功！");
-  //       // 在修改后刷新数据
-  //       loadDataList();
-  //     })
   }
 }
 

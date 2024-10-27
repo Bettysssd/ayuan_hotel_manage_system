@@ -15,6 +15,7 @@
     </el-table-column>
     <el-table-column align="center" label="商品名称" prop="goodsName" width="140px"/>
      <el-table-column align="center" label="商品价格" prop="price" width="100px" />
+     <el-table-column align="center" label="商品数量" prop="goodsAmount" width="100px" />
      <el-table-column align="center" label="商品类型" width="140px" >
         <template #default="scope">
           <span>{{ scope.row.goodsType === 0 ? '食品' : '洗漱洗涤用品'}}</span>
@@ -31,7 +32,7 @@
     <el-table-column align="center" label="商品过期日期" prop="expireTime"  width="180px"  />
     <el-table-column align="center" label="商品客户满意度" width="130">
         <template #default="scope">
-          <span v-if="scope.row.positiveRating != null"> {{ scope.row.positiveRating + "%" }} </span>
+          <span v-if="scope.row.positiveRating != null"> {{ (scope.row.positiveRating * 100) + "%" }} </span>
         </template>
     </el-table-column>
      <el-table-column align="center" label="商品好评数目" prop="goodsTrumpUp" width="120px" />
@@ -75,19 +76,24 @@
    <el-dialog v-model="dialogAddVisible" title="录入商品信息"  :width="650" :height="430">
       <el-form ref="ruleFormRef" :rules="rules" :model="goodsEditInfo">
         <el-form-item label="商品图片" :label-width="formLabelWidth">
-          <el-upload
-           class="avatar-uploader"
-           action="http://localhost:8081/api/supervisor/uploadGoodsCover"
-           :show-file-list="false"
-           :before-upload="beforeAvatarUpload"
-           :on-success="handleAvatarSuccessUpdate" >
-            <div class="image-container"> 
-              <img :src="goodsEditInfo.goodsCover"  style="width: 40px; height: 40px;" />
-            </div>
-          </el-upload>
+          <el-tooltip class="item" effect="dark" content="点击录入商品图片" placement="top">
+            <el-upload
+            class="avatar-uploader"
+            action="http://localhost:8081/api/supervisor/uploadGoodsCover"
+            :show-file-list="false"
+            :before-upload="beforeAvatarUpload"
+            :on-success="handleAvatarSuccessUpdate" >
+              <div class="image-container"> 
+                <img :src="goodsEditInfo.goodsCover"  style="width: 40px; height: 40px;" />
+              </div>
+            </el-upload>
+          </el-tooltip>
         </el-form-item>
      <el-form-item align="center" label="商品名称" prop="goodsName" >
           <el-input v-model="goodsEditInfo.goodsName" autocomplete="off" />
+     </el-form-item>
+     <el-form-item align="center" label="商品数量" prop="goodsAmount" >
+          <el-input type="number" v-model="goodsEditInfo.goodsAmount" autocomplete="off" />
      </el-form-item>
      <el-form-item align="center" label="商品价格" prop="price"  >
         <el-input type="number" v-model="goodsEditInfo.price" autocomplete="off" />
@@ -99,11 +105,10 @@
          </el-radio-group>
     </el-form-item>
     <el-form-item align="center" label="商品状态"  prop="goodsStatus" >
-         <el-select v-model="goodsEditInfo.goodsStatus">
-              <el-option  :label="`库存充足`" :value="0"> 库存充足 </el-option>
-              <el-option  :label="`缺货`" :value="1"> 缺货 </el-option>
-              <el-option  :label="`下架`" :value="2"> 下架 </el-option>
-         </el-select>
+        <el-radio-group v-model="goodsEditInfo.goodsStatus">
+            <el-radio :value="0" size="large">库存充足</el-radio>
+            <el-radio :value="2" size="large">下架</el-radio>
+        </el-radio-group>
     </el-form-item>
      <el-form-item align="center" label="商品信息" prop="goodsInfo"  >
         <el-input v-model="goodsEditInfo.goodsInfo" autocomplete="off" type="textarea" />
@@ -138,6 +143,7 @@
    <el-dialog v-model="dialogUpdateVisible" title="更新商品信息"  :width="650" :height="430">
          <el-form ref="ruleFormRef" :rules="rules" :model="goodsEditInfo">
         <el-form-item label="商品图片" :label-width="formLabelWidth">
+          <el-tooltip class="item" effect="dark" content="点击更换商品图片" placement="top">
           <el-upload
            class="avatar-uploader"
            action="http://localhost:8081/api/supervisor/uploadGoodsCover"
@@ -148,12 +154,13 @@
               <img :src="goodsEditInfo.goodsCover"  style="width: 40px; height: 40px;" />
             </div>
           </el-upload>
+          </el-tooltip>
         </el-form-item>
      <el-form-item align="center" label="商品名称" prop="goodsName" >
-          <el-input v-model="goodsEditInfo.goodsName" autocomplete="off" />
+          <el-input placeholder="请输入......" v-model="goodsEditInfo.goodsName" autocomplete="off" />
      </el-form-item>
      <el-form-item align="center" label="商品价格" prop="price"  >
-        <el-input type="number" v-model="goodsEditInfo.price" autocomplete="off" />
+        <el-input placeholder="请输入金额......" type="number" v-model="goodsEditInfo.price" autocomplete="off" />
      </el-form-item>
      <el-form-item align="center" label="商品类型"  prop="goodType" >
          <el-radio-group v-model="goodsEditInfo.goodsType">
@@ -161,15 +168,17 @@
              <el-radio :value="1" size="large">洗漱洗涤用品</el-radio>
          </el-radio-group>
     </el-form-item>
+     <el-form-item align="center" label="商品数量" prop="goodsAmount" >
+          <el-input type="number" v-model="goodsEditInfo.goodsAmount" autocomplete="off" />
+     </el-form-item>
     <el-form-item align="center" label="商品状态"  prop="goodsStatus" >
-         <el-select v-model="goodsEditInfo.goodsStatus">
-              <el-option  :label="`库存充足`" :value="0"> 库存充足 </el-option>
-              <el-option  :label="`缺货`" :value="1"> 缺货 </el-option>
-              <el-option  :label="`下架`" :value="2"> 下架 </el-option>
-         </el-select>
+      <el-radio-group v-model="goodsEditInfo.goodsStatus">
+            <el-radio :value="0" size="large">库存充足</el-radio>
+            <el-radio :value="2" size="large">下架</el-radio>
+      </el-radio-group>
     </el-form-item>
      <el-form-item align="center" label="商品信息" prop="goodsInfo"  >
-        <el-input v-model="goodsEditInfo.goodsInfo" autocomplete="off" type="textarea" />
+        <el-input placeholder="请输入......" v-model="goodsEditInfo.goodsInfo" autocomplete="off" type="textarea" />
      </el-form-item>
      <el-form-item label="商品生产时间" :label-width="formLabelWidth" prop="productTime">
       <el-date-picker
@@ -243,10 +252,30 @@ const rules = reactive<FormRules<Goods>>({
   goodsName: [
     { required: true, message: '商品名字不能为空', trigger: 'blur' },
     { min: 1, max: 20, message: '字符长度应该在1到20之间', trigger: 'change' },
+    {
+        validator: (rule, value, callback) => {
+            if (value && value.includes(' ')) {
+                callback(new Error('商品名字中不能包含空格'));
+            } else {
+                callback();
+            }
+        },
+        trigger: 'change'
+    }
   ],
   goodsInfo: [
      { required: true, message: '商品信息不能为空', trigger: 'blur' },
     { min: 1, max: 150, message: '字符长度应该在1到150之间', trigger: 'change' },
+    {
+        validator: (rule, value, callback) => {
+            if (value && value.includes(' ')) {
+                callback(new Error('商品信息中不能包含空格'));
+            } else {
+                callback();
+            }
+        },
+        trigger: 'change'
+    }
   ],
   goodsStatus: [
      { required: true, message: '请选择一个商品当前的状态', trigger: 'change' },
@@ -260,6 +289,20 @@ const rules = reactive<FormRules<Goods>>({
            validator: (rule, value, callback) => {
              if (value <= 0) {
                 callback(new Error('价格必须为正数'));
+              } else {
+                // 验证成功
+                callback();
+              }
+            },
+            trigger: 'change',
+        }, 
+  ],
+  goodsAmount: [
+    { required: true, message: '请输入商品的数量', trigger: 'blur' },
+        {
+           validator: (rule, value, callback) => {
+             if (value <= 0) {
+                callback(new Error('数量必须为正数'));
               } else {
                 // 验证成功
                 callback();
@@ -405,6 +448,7 @@ interface Goods {
   goodsId: string
   goodsCover: string
   goodsName: string
+  goodsAmount: string
   price: number
   goodsType: number
   goodsStatus: number
@@ -473,6 +517,7 @@ const noticeError = ($content : any) => {
   goodsId: '',
   goodsCover: '',
   goodsName: '',
+  goodsAmount: null,
   price: null,
   goodsType: null,
   goodsStatus: null,
@@ -501,6 +546,7 @@ const handleEdit = (index: number, row: Goods) => {
   goodsEditInfo.goodsType = row.goodsType;
   goodsEditInfo.goodsStatus = row.goodsStatus;
   goodsEditInfo.goodsInfo = row.goodsInfo;
+  goodsEditInfo.goodsAmount = row.goodsAmount;
   goodsEditInfo.productTime = row.productTime;
   goodsEditInfo.expireTime = row.expireTime;
   goodsEditInfo.positiveRating = row.positiveRating;
@@ -515,6 +561,7 @@ const clearLastCache = () => {
   goodsEditInfo.goodsCover = '';
   goodsEditInfo.goodsName = '';
   goodsEditInfo.price = null;
+  goodsEditInfo.goodsAmount = null;
   goodsEditInfo.goodsType = null;
   goodsEditInfo.goodsStatus = null;
   goodsEditInfo.goodsInfo = '';

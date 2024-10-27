@@ -16,10 +16,6 @@
         <p style="text-align: center;">用户消费top5情况</p>
         <div ref="info3" style="width: 500px; height: 300px;"></div>
     </div>
-   <div style="width: 500px; height: 400px; margin-left: 50px;">
-        <p style="text-align: center;">用户欠费top5情况</p>
-        <div ref="info4" style="width: 500px; height: 300px;"></div>
-   </div>
 </div>
 </template>
 <script setup>
@@ -30,7 +26,6 @@ const info = ref(null);  // 这是你用于存储 ECharts DOM 元素的 ref
 const info1 = ref(null);
 const info2 = ref(null);
 const info3 = ref(null);
-const info4 = ref(null);
 // 异步获取用户数量
 async function fetchCurrentUserCount(type, status) {
   try {
@@ -81,11 +76,37 @@ async function barChartsThree() {
     if (info3.value) {
         var barChartsThree = echarts.init(info3.value);
         userPayInfo.value = await fetchCurrentPayStatusUsersCount(1);
+        console.log(userPayInfo.value)
+         if (userPayInfo.value == null || !(userPayInfo.value instanceof Array) || userPayInfo.value.length === 0) {
+      // 没有数据时，设置图表显示“无”
+        var option = {
+            title: {
+                text: '用户消费前5名',
+                left: 'center',
+                top: 'middle',
+                textStyle: {
+                    color: '#999',
+                    fontSize: 16
+                }
+            },
+            series: [{
+                type: 'pie', // 可以使用任意类型，这里用pie作为示例
+                radius: ['50%', '70%'],
+                avoidLabelOverlap: false,
+                label: {
+                    show: true,
+                    position: 'center',
+                    formatter: '无' // 显示“无”的信息
+                },
+                data: [] // 空数据
+            }]
+        };
+        barChartsThree.setOption(option);
+        return; // 退出函数，不再执行后续代码
+    }
         userPayInfo.value.sort((a, b) => a.fee - b.fee);
         var userNames = userPayInfo.value.map(userInfo  => userInfo.userName); 
         var userFee = userPayInfo.value.map(userInfo  => userInfo.fee); 
-        console.log(userNames);
-        console.log(userFee);
         var option = {
         tooltip: {
             trigger: 'axis',
@@ -109,7 +130,6 @@ async function barChartsThree() {
             data: userNames
         },
         series: [
-            
             {
             name: '用户消费前5名',
             type: 'bar',
@@ -123,51 +143,7 @@ async function barChartsThree() {
      barChartsThree.setOption(option);
   }
 }
-// 用户欠费top5
-async function barChartsFour() {
-    if (info4.value) {
-        var barChartsFour = echarts.init(info4.value);
-        userPayInfo.value = await fetchCurrentPayStatusUsersCount(0);
-        userPayInfo.value.sort((a, b) => a.fee - b.fee);
-        var userNames = userPayInfo.value.map(userInfo  => userInfo.userName); 
-        var userFee = userPayInfo.value.map(userInfo  => userInfo.fee); 
-        var option = {
-        tooltip: {
-            trigger: 'axis',
-            axisPointer: {
-            type: 'shadow'
-            }
-        },
-        legend: {},
-        grid: {
-            left: '3%',
-            right: '4%',
-            bottom: '3%',
-            containLabel: true
-        },
-        xAxis: {
-            type: 'value',
-            boundaryGap: [0, 0.01]
-        },
-        yAxis: {
-            type: 'category',
-            data: userNames
-        },
-        series: [
-            
-            {
-            name: '用户欠费前5名',
-            type: 'bar',
-            data: userFee,
-            itemStyle: {
-                color: '#9C27B0' // 例如，使用浅绿色
-            },
-            }
-        ]
- };
-  barChartsFour.setOption(option);
-    }
-}
+
 // 多层柱状图--显示客房当前状态
 async function barChartsTwo() {
      if (info2.value) {
@@ -365,7 +341,6 @@ onMounted(() => {
   barCharts();
   barChartsTwo();
   barChartsThree();
-  barChartsFour();
 });
 </script>
 

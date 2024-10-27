@@ -39,7 +39,7 @@
     <el-table-column align="center" label="食堂打烊时间" prop="canteenClosedTime"  width="180px" />
        <el-table-column align="center" label="食堂客户满意度" width="130">
           <template #default="scope">
-          <span v-if="scope.row.canteenRating != null"> {{ scope.row.canteenRating + "%" }} </span>
+          <span v-if="scope.row.canteenRating != null"> {{ (scope.row.canteenRating * 100) + "%" }} </span>
         </template>
     </el-table-column>
      <el-table-column align="center" label="食堂好评数目" prop="canteenTrumpUp" width="120px" />
@@ -84,6 +84,7 @@
    <el-dialog v-model="dialogAddVisible" title="录入食堂信息"  :width="650" :height="430">
         <el-form ref="ruleFormRef" :rules="rules" :model="canteenEditInfo">
         <el-form-item label="食堂图片" :label-width="formLabelWidth">
+           <el-tooltip class="item" effect="dark" content="点击录入食堂图片" placement="top">
           <el-upload
            class="avatar-uploader"
            action="http://localhost:8081/api/supervisor/uploadCanteenCover"
@@ -94,9 +95,10 @@
               <img :src="canteenEditInfo.canteenCover"  style="width: 40px; height: 40px;" />
             </div>
           </el-upload>
+           </el-tooltip>
         </el-form-item>
         <el-form-item label="食堂名称" :label-width="formLabelWidth" prop="canteenName">
-         <el-input v-model="canteenEditInfo.canteenName" autocomplete="off" />
+         <el-input placeholder="请输入......" v-model="canteenEditInfo.canteenName" autocomplete="off" />
         </el-form-item>
       <el-form-item align="center" label="食堂风味类型" prop="canteenFlavorType" >
          <el-radio-group v-model="canteenEditInfo.canteenFlavorType">
@@ -105,20 +107,20 @@
          </el-radio-group>
       </el-form-item>
       <el-form-item align="center" label="食堂当前状态" prop="canteenOpenStatus" >
-         <el-select v-model="canteenEditInfo.canteenOpenStatus">
+         <el-select v-model="canteenEditInfo.canteenOpenStatus" placeholder="请选择">
               <el-option  :label="`暂停营业`" :value="0"> 暂停营业 </el-option>
               <el-option  :label="`打烊`" :value="1"> 打烊 </el-option>
               <el-option  :label="`营业`" :value="2"> 营业 </el-option>
          </el-select>
       </el-form-item>
      <el-form-item label="食堂可容纳人员数量" prop="canteenTotalTables">
-      <el-input type="number" v-model="canteenEditInfo.canteenTotalTables" autocomplete="off" />
+      <el-input placeholder="请输入人数......" type="number" v-model="canteenEditInfo.canteenTotalTables" autocomplete="off" />
     </el-form-item> 
     <el-form-item label="食堂简介" prop="canteenIntroduce">
-      <el-input v-model="canteenEditInfo.canteenIntroduce" type="textarea" />
+      <el-input placeholder="请输入......" v-model="canteenEditInfo.canteenIntroduce" type="textarea" />
     </el-form-item>
     <el-form-item label="食堂菜谱" prop="canteenOfferFood">
-      <el-input v-model="canteenEditInfo.canteenOfferFood" type="textarea" />
+      <el-input placeholder="请输入......" v-model="canteenEditInfo.canteenOfferFood" type="textarea" />
     </el-form-item>
      <el-form-item label="食堂营业时间" :label-width="formLabelWidth" prop="canteenOpenTime">
       <el-time-picker
@@ -148,6 +150,7 @@
    <el-dialog v-model="dialogUpdateVisible" title="更新食堂信息"  :width="650" :height="430">
         <el-form ref="ruleFormRef" :rules="rules" :model="canteenEditInfo">
         <el-form-item label="食堂图片" :label-width="formLabelWidth">
+         <el-tooltip class="item" effect="dark" content="点击更换食堂图片" placement="top">
           <el-upload
            class="avatar-uploader"
            action="http://localhost:8081/api/supervisor/uploadCanteenCover"
@@ -158,6 +161,7 @@
               <img :src="canteenEditInfo.canteenCover"  style="width: 40px; height: 40px;" />
             </div>
           </el-upload>
+         </el-tooltip>
         </el-form-item>
         <el-form-item label="食堂名称" :label-width="formLabelWidth" prop="canteenName" >
          <el-input v-model="canteenEditInfo.canteenName" autocomplete="off" />
@@ -231,9 +235,6 @@ import type { FormRules } from 'element-plus';
 import type { FormInstance } from 'element-plus';
 import { ElMessageBox } from 'element-plus';
 import router from '@/router';
-import { errorMessages } from 'vue/compiler-sfc';
-
-
 
 const dialogAddVisible = ref(false)
 const dialogUpdateVisible = ref(false)
@@ -254,6 +255,16 @@ const rules = reactive<FormRules<Canteen>>({
   canteenName: [
     { required: true, message: '食堂名称不能为空', trigger: 'blur' },
     { min: 1, max: 10, message: '字符长度应该在1到10之间', trigger: 'change' },
+    {
+        validator: (rule, value, callback) => {
+            if (value && value.includes(' ')) {
+                callback(new Error('食堂名称中不能包含空格'));
+            } else {
+                callback();
+            }
+        },
+        trigger: 'change'
+    }
   ],
   canteenFlavorType: [
      { required: true, message: '请选择一个风味类型', trigger: 'change' },
@@ -284,10 +295,30 @@ const rules = reactive<FormRules<Canteen>>({
   canteenIntroduce: [
     { required: true, message: '食堂简介不能为空', trigger: 'blur' },
     { min: 1, max: 500, required: true, message: '字符长度应该在1到500之间', trigger: 'change' },
+    {
+        validator: (rule, value, callback) => {
+            if (value && value.includes(' ')) {
+                callback(new Error('食堂简介中不能包含空格'));
+            } else {
+                callback();
+            }
+        },
+        trigger: 'change'
+    }
   ],
    canteenOfferFood: [
     { required: true, message: '食堂菜谱不能为空', trigger: 'blur' },
     { min: 1, max: 200, message: '字符长度应该在1到200之间', trigger: 'change' },
+    {
+        validator: (rule, value, callback) => {
+            if (value && value.includes(' ')) {
+                callback(new Error('食堂菜谱中不能包含空格'));
+            } else {
+                callback();
+            }
+        },
+        trigger: 'change'
+    }
   ],
 })  
 const dialogVisible = ref(false)

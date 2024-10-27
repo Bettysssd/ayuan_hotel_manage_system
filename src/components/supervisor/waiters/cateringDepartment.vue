@@ -33,9 +33,10 @@
             scope.row.jobType === 6 ?  '中餐服务员' : '西餐服务员' }}</span>
         </template>
     </el-table-column>
+    <el-table-column align="center" label="隶属服务餐厅" prop="canteenName" width="100" />
     <el-table-column align="center" label="服务好评率" prop="waiterPositiveRating" width="120">
           <template #default="scope">
-          <span v-if="scope.row.waiterPositiveRating != null"> {{ scope.row.waiterPositiveRating + "%" }} </span>
+          <span v-if="scope.row.waiterPositiveRating != null"> {{ (scope.row.waiterPositiveRating * 100) + "%" }} </span>
         </template>
     </el-table-column>
     <el-table-column align="center" label="好评数目" prop="waiterTrumpUp"  width="100"/>
@@ -84,6 +85,7 @@
    <el-dialog v-model="dialogAddVisible" title="录入服务员信息"  :width="550" :height="300">
         <el-form ref="ruleFormRef" :rules="rules" :model="waiterEditInfo">
         <el-form-item label="服务员头像" :label-width="formLabelWidth">
+            <el-tooltip class="item" effect="dark" content="点击录入服务员图片" placement="top">
           <el-upload
            class="avatar-uploader"
            action="http://localhost:8081/api/supervisor/uploadWaiterCover"
@@ -96,9 +98,10 @@
                <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
             </div>
           </el-upload>
+           </el-tooltip>
         </el-form-item>
         <el-form-item label="服务员姓名" :label-width="formLabelWidth" prop="waiterName" >
-         <el-input v-model="waiterEditInfo.waiterName" autocomplete="off" />
+         <el-input placeholder="请输入......" v-model="waiterEditInfo.waiterName" autocomplete="off" />
         </el-form-item>
         <el-form-item label="性别" :label-width="formLabelWidth" prop="gender" >
           <el-radio-group v-model="waiterEditInfo.gender">
@@ -107,12 +110,17 @@
           </el-radio-group>
         </el-form-item>
          <el-form-item label="服务类型" :label-width="formLabelWidth" prop="jobType" >
-          <el-select v-model="waiterEditInfo.jobType">
+          <el-select v-model="waiterEditInfo.jobType" placeholder="请选择">
               <el-option  :label="`中餐厨师`" :value="4"> 中餐厨师 </el-option>
               <el-option  :label="`西餐厨师`" :value="5"> 西餐厨师 </el-option>
               <el-option  :label="`中餐食堂服务员`" :value="6"> 中餐食堂服务员 </el-option>
               <el-option  :label="`西餐食堂服务员`" :value="7"> 西餐食堂服务员 </el-option>
          </el-select>
+        </el-form-item>
+         <el-form-item label="隶属餐厅" :label-width="formLabelWidth" prop="departmentId"  >
+          <el-select v-model="waiterEditInfo.departmentId" placeholder="请选择" >
+              <el-option v-for="(name, id) in canteenInfo" :key="id" :label="name" :value="id"> {{ name }} </el-option>
+          </el-select>
         </el-form-item>
       </el-form>
       <template #footer>
@@ -129,6 +137,7 @@
    <el-dialog v-model="dialogUpdateVisible" title="更新服务员信息"  :width="550" :height="300">
         <el-form ref="ruleFormRef" :rules="rules" :model="waiterEditInfo">
         <el-form-item label="服务员头像" :label-width="formLabelWidth">
+           <el-tooltip class="item" effect="dark" content="点击更换服务员头像" placement="top">
           <el-upload
            class="avatar-uploader"
            action="http://localhost:8081/api/supervisor/uploadWaiterCover"
@@ -139,6 +148,7 @@
               <img :src="waiterEditInfo.waiterCover"  style="width: 40px; height: 40px;" />
             </div>
           </el-upload>
+          </el-tooltip>
         </el-form-item>
         <el-form-item label="服务员姓名" :label-width="formLabelWidth" prop="waiterName" >
          <el-input v-model="waiterEditInfo.waiterName" autocomplete="off" />
@@ -150,7 +160,7 @@
           </el-radio-group>
         </el-form-item>
          <el-form-item label="服务类型" :label-width="formLabelWidth" prop="jobType">
-          <el-select v-model="waiterEditInfo.jobType">
+          <el-select v-model="waiterEditInfo.jobType" placeholder="请选择">
               <el-option  :label="`保洁人员`" :value="0"> 保洁人员 </el-option>
               <el-option  :label="`商品配送员`" :value="1"> 商品配送员 </el-option>
               <el-option  :label="`泊车员`" :value="2"> 泊车员 </el-option>
@@ -164,13 +174,20 @@
               <el-option  :label="`总机话务员`" :value="10"> 总机话务员</el-option>
          </el-select>
         </el-form-item>
-          <el-form-item label="变更状态" :label-width="formLabelWidth" prop="waiterStatus" >
-         <el-select v-model="waiterEditInfo.waiterStatus">
-              <el-option  :label="`空闲`" :value="0"> 空闲 </el-option>
-              <el-option  :label="`忙碌中`" :value="1"> 忙碌中 </el-option>
-              <el-option  :label="`休假`" :value="2"> 休假 </el-option>
-              <el-option  :label="`离职`" :value="3"> 离职 </el-option>
-         </el-select>
+        <el-form-item label="变更状态" :label-width="formLabelWidth" prop="waiterStatus" >
+          <el-select v-model="waiterEditInfo.waiterStatus">
+                <el-option  :label="`空闲`" :value="0"> 空闲 </el-option>
+                <el-option  :label="`忙碌中`" :value="1"> 忙碌中 </el-option>
+                <el-option  :label="`休假`" :value="2"> 休假 </el-option>
+                <el-option  :label="`离职`" :value="3"> 离职 </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item v-if ="waiterEditInfo.jobType === 4 || waiterEditInfo.jobType === 5 
+                            || waiterEditInfo.jobType === 6 || waiterEditInfo.jobType === 7"
+        label="隶属餐厅" :label-width="formLabelWidth" prop="departmentId"  >
+          <el-select v-model="waiterEditInfo.departmentId" placeholder="请选择" >
+              <el-option v-for="(name, id) in canteenInfo" :key="id" :label="name" :value="id"> {{ name }} </el-option>
+          </el-select>
         </el-form-item>
       </el-form>
       <template #footer>
@@ -321,6 +338,8 @@ interface Waiter {
   waiterId: string
   waiterCover: string
   waiterName: string
+  canteenName: string
+  departmentId: string
   gender: number
   waiterStatus: number
   jobType: number
@@ -364,6 +383,16 @@ const rules = reactive<FormRules<Waiter>>({
   waiterName: [
     { required: true, message: '服务员名字不能为空', trigger: 'blur' },
     { min: 2, max: 15, message: '字符长度应该在2到15之间', trigger: 'change' },
+    {
+        validator: (rule, value, callback) => {
+            if (value && value.includes(' ')) {
+                callback(new Error('服务员名字中不能包含空格'));
+            } else {
+                callback();
+            }
+        },
+        trigger: 'change'
+    }
   ],
   gender: [
      { required: true, message: '请选择一个性别', trigger: 'change' },
@@ -371,7 +400,12 @@ const rules = reactive<FormRules<Waiter>>({
   jobType: [
      { required: true, message: '请选择一个服务类型', trigger: 'change' },
   ],
- 
+  departmentId: [
+     { required: true, message: '请选择一个隶属餐厅', trigger: 'change' },
+  ],
+  waiterStatus: [
+    { required: true, message: '请选择一个服务员状态', trigger: 'change' },
+  ]
 })
 
   // 自定义搜索
@@ -385,7 +419,6 @@ function fetchData(newPage: number) {
 const loadDataList = async () => {
     try {  
     const response = await axiosInstance.post(`/api/supervisor/queryWaiterList`, query);
-    console.log(response)
     // 判断token是否无效或过期
     if (response.headers['notice'] === 'unable') {
         noticeError("当前token过期或无效,请重新登录");
@@ -410,7 +443,15 @@ const loadDataList = async () => {
    
 
 // 初始化加载页面
-onMounted(loadDataList)
+onMounted(() => {
+  loadDataList(),
+  axiosInstance.post(`/api/supervisor/queryCanteenList`)
+  .then(response => {
+      const canteens = response.data.data.list
+      canteens.forEach(canteen => {
+      canteenInfo[canteen.canteenId] = canteen.canteenName;});
+  })
+})
 
 // 业务提示框弹出
 const notice = ($content : any) => {
@@ -429,6 +470,7 @@ const noticeError = ($content : any) => {
  // 服务员修改集合
   const waiterEditInfo = reactive ( {
   waiterId: '',  
+  departmentId: '',
   waiterCover: '',
   waiterName: '',
   gender: null,
@@ -450,16 +492,21 @@ function handleAvatarSuccessUpdate(response : any, file : any ) {
     
 }
 
-// 清除缓存
-const clearLastCache = () => {
+const canteenInfo = reactive ({})
+// 清除缓存,异步展示当前所有的食堂信息
+const clearLastCache =  () => {
+  
   dialogAddVisible.value = true;
+  waiterEditInfo.waiterName = '';
   waiterEditInfo.waiterId = '';
   waiterEditInfo.waiterCover = '';
+  waiterEditInfo.departmentId = '';
   waiterEditInfo.jobType = null;
   waiterEditInfo.waiterTrumpUp = null;
   waiterEditInfo.waiterTrumpDown = null
   waiterEditInfo.lastDayOffTime = null;
   waiterEditInfo.lastFireTime = null;
+  
 }
 
 // 编辑逻辑处理
@@ -471,6 +518,7 @@ const handleEdit = (index: number, row: Waiter) => {
   waiterEditInfo.waiterCover = row.waiterCover;
   waiterEditInfo.waiterStatus = row.waiterStatus;
   waiterEditInfo.jobType = row.jobType;
+  waiterEditInfo.departmentId = row.departmentId;
 }
 
 

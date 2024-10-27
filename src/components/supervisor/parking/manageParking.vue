@@ -65,6 +65,7 @@
    <el-dialog v-model="dialogUpdateVisible" title="更新车辆停放信息"  :width="550" :height="300">
         <el-form ref="ruleFormRef" :rules="rules" :model="carEditInfo">
         <el-form-item label="车辆图片" :label-width="formLabelWidth">
+        <el-tooltip class="item" effect="dark" content="点击更换车辆图片" placement="top">
           <el-upload
            class="avatar-uploader"
            action="http://localhost:8081/api/supervisor/uploadCarParkingCover"
@@ -75,6 +76,7 @@
               <img :src="carEditInfo.carCover"  style="width: 50px; height: 30px;" />
             </div>
           </el-upload>
+        </el-tooltip>
         </el-form-item>
         <el-form-item label="车主姓名" :label-width="formLabelWidth" prop="carOwnerName" disa >
          <el-input v-model="carEditInfo.carOwnerName" autocomplete="off" disabled />
@@ -83,7 +85,7 @@
          <el-input type="number" v-model="carEditInfo.carOwnerContact" autocomplete="off" disabled/>
         </el-form-item>
         <el-form-item label="停车累计费用" :label-width="formLabelWidth"  prop="cumulativeCost">
-         <el-input type="number" v-model="carEditInfo.cumulativeCost" autocomplete="off" />
+         <el-input placeholder="请输入金额......" type="number" v-model="carEditInfo.cumulativeCost" autocomplete="off" />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -272,7 +274,8 @@ const loadDataList = async () => {
     }
     dataList.value = response.data.data.list;
     total.value = response.data.data.total;
-    if(total.value === null || total.value === 0) {
+    console.log(query.keyword)
+    if((total.value === null || total.value === 0) && query.keyword != '') {
         noticeError("太难了，换个关键字再看看吧");
         return;
     }
@@ -302,7 +305,7 @@ const noticeError = ($content : any) => {
         });
 }
  // 车辆信息修改集合
-  const carEditInfo = reactive ( {
+  const carEditInfo = reactive<Car> ( {
   parkingId: '',
   carCover: '',
   carOwnerName: '',

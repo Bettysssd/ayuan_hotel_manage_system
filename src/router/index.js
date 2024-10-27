@@ -103,7 +103,34 @@ const router = createRouter({
           type: 'success',
         });
         next(); 
-      }
+      },
+      children: [
+        {
+          path: '/user/bookHotel',
+          name:"bookHotel",
+          component: () => import("@/components/user/book/bookHotel.vue")
+        },
+        {
+          path: '/user/bookGoods',
+          name:"bookGoods",
+          component: () => import("@/components/user/book/bookGoods.vue")
+        },
+        {
+          path: '/user/bookCanteen',
+          name:"bookCanteen",
+          component: () => import("@/components/user/book/bookCanteen.vue")
+        },
+        {
+          path: '/user/bookParking',
+          name:"bookParking",
+          component: () => import("@/components/user/book/bookParking.vue")
+        },
+        {
+          path: '/user/order',
+          name:"order",
+          component: () => import("@/components/user/order/orders.vue")
+        },
+      ]
     },
   ]
 });
