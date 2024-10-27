@@ -1,7 +1,7 @@
 package com.comfort.hotel.controller;
-import com.comfort.hotel.domain.dto.GoodsDTO;
+import com.comfort.hotel.domain.vo.GoodsVO;
 import com.comfort.hotel.service.GoodsService;
-import com.comfort.hotel.domain.dto.PageDTO;
+import com.comfort.hotel.domain.vo.PageVO;
 import com.comfort.hotel.domain.vo.ResponseVO;
 import com.github.pagehelper.PageInfo;
 import io.swagger.annotations.Api;
@@ -28,28 +28,26 @@ public class GoodsController {
     /**
      * 分页查询商品信息
      *
-     * @param pageDTO
+     * @param pageVO
      * @return
      */
     @ApiOperation(value = "分页查询商品信息")
     @PostMapping("/queryGoodsList")
-    public ResponseVO<PageInfo<GoodsDTO>> queryGoodsList(@RequestBody PageDTO pageDTO) {
-        PageInfo<GoodsDTO> goodsInInList = GoodsService.findGoodsInList(pageDTO);
+    public ResponseVO<PageInfo<GoodsVO>> queryGoodsList(@RequestBody PageVO pageVO) {
+        PageInfo<GoodsVO> goodsInInList = GoodsService.findGoodsInList(pageVO);
         return ResponseVO.success(goodsInInList);
     }
-
-
 
 
     /**
      * 更新商品信息
      *
-     * @param goodsDTO
+     * @param goodsVO
      */
     @ApiOperation(value = "更新商品信息")
     @PostMapping("/updateGoodsInfo")
-    public void updateGoodsInfo(@RequestBody GoodsDTO goodsDTO) {
-        GoodsService.updateGoodsInfo(goodsDTO);
+    public void updateGoodsInfo(@RequestBody GoodsVO goodsVO) {
+        GoodsService.updateGoodsInfo(goodsVO);
     }
 
     /**
@@ -75,11 +73,11 @@ public class GoodsController {
 
     /**
      * 录入商品信息
-     * @param goodsDTO
+     * @param goodsVO
      */
     @ApiOperation(value = "录入商品信息")
     @PostMapping("/addGoodsInfo")
-    public void addGoodsInfo(@RequestBody GoodsDTO goodsDTO) {
-        GoodsService.addGoodsInfo(goodsDTO);
+    public void addGoodsInfo(@RequestBody GoodsVO goodsVO) {
+        GoodsService.addGoodsInfo(goodsVO);
     }
 }

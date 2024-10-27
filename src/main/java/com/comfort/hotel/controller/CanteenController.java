@@ -1,6 +1,6 @@
 package com.comfort.hotel.controller;
-import com.comfort.hotel.domain.dto.CanteenDTO;
-import com.comfort.hotel.domain.dto.PageDTO;
+import com.comfort.hotel.domain.vo.CanteenVO;
+import com.comfort.hotel.domain.vo.PageVO;
 import com.comfort.hotel.domain.vo.ResponseVO;
 import com.comfort.hotel.service.CanteenService;
 import com.github.pagehelper.PageInfo;
@@ -29,13 +29,13 @@ public class CanteenController {
     /**
      * 分页查询食堂信息
      *
-     * @param pageDTO
+     * @param pageVO
      * @return
      */
     @ApiOperation(value = "分页查询食堂信息")
     @PostMapping("/queryCanteenList")
-    public ResponseVO<PageInfo<CanteenDTO>> queryCanteenList(@RequestBody PageDTO pageDTO) {
-        PageInfo<CanteenDTO> canteenInList = canteenService.findCanteenInList(pageDTO);
+    public ResponseVO<PageInfo<CanteenVO>> queryCanteenList(@RequestBody(required = false) PageVO pageVO) {
+        PageInfo<CanteenVO> canteenInList = canteenService.findCanteenInList(pageVO);
         return ResponseVO.success(canteenInList);
     }
 
@@ -45,12 +45,12 @@ public class CanteenController {
     /**
      * 更新食堂信息
      *
-     * @param canteenDTO
+     * @param canteenVO
      */
     @ApiOperation(value = "更新食堂信息")
     @PostMapping("/updateCanteenInfo")
-    public void updateCarParkingInfo(@RequestBody CanteenDTO canteenDTO) {
-        canteenService.updateCanteenInfo(canteenDTO);
+    public void updateCarParkingInfo(@RequestBody CanteenVO canteenVO) {
+        canteenService.updateCanteenInfo(canteenVO);
     }
 
     /**
@@ -76,12 +76,12 @@ public class CanteenController {
 
     /**
      * 录入食堂信息
-     * @param canteenDTO
+     * @param canteenVO
      */
     @ApiOperation(value = "录入食堂信息")
     @PostMapping("/addCanteenInfo")
-    public void addCanteenInfo(@RequestBody CanteenDTO canteenDTO) {
-        canteenService.addCanteenInfo(canteenDTO);
+    public void addCanteenInfo(@RequestBody CanteenVO canteenVO) {
+        canteenService.addCanteenInfo(canteenVO);
     }
 
 }

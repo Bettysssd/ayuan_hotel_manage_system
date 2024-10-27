@@ -2,6 +2,7 @@ package com.comfort.hotel.config;
 
 import com.comfort.hotel.constants.Constants;
 import com.comfort.hotel.service.CanteenService;
+import com.comfort.hotel.service.GoodsService;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -15,7 +16,7 @@ import java.util.List;
  * @Date: 2024/9/19 15:07
  */
 @Component
-public class AutoUpdateCanteenStatus {
+public class AutoUpdateObjectStatus {
 
     @Resource
     private CanteenService canteenService;
@@ -23,14 +24,14 @@ public class AutoUpdateCanteenStatus {
     // 检查食堂的状态，是否需要进行更新 没一个小时触发一次定时任务
     @Scheduled(cron = "0 0 */1 * * ?")
     public void checkCanteenStatus() {
-        System.out.println("定时任务启动中.........");
+        System.out.println("食堂定时任务启动中.........");
         int updateCount = doneUpdateCanteenStatus();
         if (updateCount == Constants.ZERO) {
             System.out.println("当前没有任何数据发生变更..........");
         } else {
             System.out.println("已变更数据：" + updateCount + "条");
         }
-        System.out.println("定时任务结束.........");
+        System.out.println("食堂定时任务结束.........");
     }
 
     // 做更新的判断，符合这改变状态，不符合则停止
@@ -61,4 +62,5 @@ public class AutoUpdateCanteenStatus {
         }
             return count;
     }
+
 }

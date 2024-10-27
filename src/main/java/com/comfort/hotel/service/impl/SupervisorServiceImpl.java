@@ -1,9 +1,9 @@
 package com.comfort.hotel.service.impl;
 
 import com.comfort.hotel.constants.Constants;
-import com.comfort.hotel.domain.dto.PageDTO;
-import com.comfort.hotel.domain.dto.SuperVisorLoginDTO;
-import com.comfort.hotel.domain.dto.UserDTO;
+import com.comfort.hotel.domain.vo.PageVO;
+import com.comfort.hotel.domain.vo.SuperVisorLoginVO;
+import com.comfort.hotel.domain.vo.UserVO;
 import com.comfort.hotel.domain.entity.Supervisor;
 import com.comfort.hotel.mapper.SupervisorMapper;
 import com.comfort.hotel.mapper.UserMapper;
@@ -52,9 +52,9 @@ public class SupervisorServiceImpl implements SupervisorService {
 
     // 管理员登录
     @Override
-    public void login(HttpServletResponse response, SuperVisorLoginDTO superVisorLoginDTO) {
+    public void login(HttpServletResponse response, SuperVisorLoginVO superVisorLoginVO) {
         Supervisor supervisor = new Supervisor();
-        BeanUtils.copyProperties(superVisorLoginDTO, supervisor);
+        BeanUtils.copyProperties(superVisorLoginVO, supervisor);
         // 查找数据库，查看用户是否已经注册,获取密码匹配错误的
         String supervisorId = getSupervisorId(supervisor);
         String userNameInBase64 = StringTools.encodeUserNameToBase64(getSupervisorNameById(supervisorId));
@@ -82,22 +82,22 @@ public class SupervisorServiceImpl implements SupervisorService {
     }
 
     @Override
-    public PageInfo<UserDTO> findUserInList(PageDTO pageDTO) {
+    public PageInfo<UserVO> findUserInList(PageVO pageVO) {
         // 第几页
-        Integer page = pageDTO.getCurrentPage();
+        Integer page = pageVO.getCurrentPage();
         // 每页显示的大小
-        Integer size = pageDTO.getSize();
+        Integer size = pageVO.getSize();
         // 使用pageHelper提高编码效率
         // 默认查询所有记录，PageHelper分页拦截器拦截，即在执行相关Sql之前会拦截自动加上limit
         PageHelper.startPage(page, size);
-        List<UserDTO> list = userMapper.selectUserList(pageDTO.getKeyword());
+        List<UserVO> list = userMapper.selectUserList(pageVO.getKeyword());
         return new PageInfo<>(list);
     }
 
     // 修改用户当前状态
     @Override
-    public void changeUserStatus(UserDTO userDTO) {
-        userMapper.changeUserStatusById(userDTO.getUserStatus(), userDTO.getUserId());
+    public void changeUserStatus(UserVO userVO) {
+        userMapper.changeUserStatusById(userVO.getUserStatus(), userVO.getUserId());
     }
 
 

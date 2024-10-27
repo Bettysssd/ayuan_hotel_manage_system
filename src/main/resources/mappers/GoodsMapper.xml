@@ -4,11 +4,13 @@
 <mapper namespace="com.comfort.hotel.mapper.GoodsMapper">
 
 <!-- 配置映射关系-->
-    <resultMap id="goods_result_map" type="com.comfort.hotel.domain.dto.GoodsDTO">
+    <resultMap id="goods_result_map" type="com.comfort.hotel.domain.vo.GoodsVO">
         <result column="goods_id" property="goodsId"/>
         <result column="goods_cover" property="goodsCover"/>
         <result column="goods_name" property="goodsName"/>
         <result column="goods_type" property="goodsType"/>
+        <result column="price" property="price"/>
+        <result column="goods_amount" property="goodsAmount"/>
         <result column="goods_status" property="goodsStatus"/>
         <result column="goods_info" property="goodsInfo"/>
         <result column="product_time" property="productTime"/>
@@ -18,12 +20,19 @@
         <result column="goods_trump_down" property="goodsTrumpDown"/>
     </resultMap>
 
+    <resultMap id="goods_info_result_map" type="com.comfort.hotel.domain.dto.GoodsDTO">
+        <result column="goods_cover" property="goodsCover"/>
+        <result column="goods_name" property="goodsName"/>
+        <result column="positive_rating" property="positiveRating"/>
+    </resultMap>
+
 
     <sql id="goods_column_list">
           `goods_id`,
           `goods_cover`,
           `goods_name`,
           `price`,
+          `goods_amount` ,
           `goods_type`,
           `goods_status`,
           `goods_info`,
@@ -40,11 +49,14 @@
             <if test="bean.goodsId != null">
                 goods_id = #{bean.goodsId},
             </if>
-            <if test="bean.goodsCover != null">
+            <if test="bean.goodsCover != null and bean.goodsCover != '' ">
                 goods_cover = #{bean.goodsCover},
             </if>
             <if test="bean.goodsName != null and bean.goodsName !='' ">
                 goods_name = #{bean.goodsName},
+            </if>
+            <if test="bean.goodsAmount != null and bean.goodsAmount !='' ">
+                goods_amount = #{bean.goodsAmount},
             </if>
             <if test="bean.price != null and bean.price !='' ">
                 price = #{bean.price},
@@ -70,7 +82,7 @@
     <update id="updateGoodsInfo">
         update goods
         <set>
-            <if test="bean.goodsCover != null">
+            <if test="bean.goodsCover != null and bean.goodsCover != '' ">
                 goods_cover = #{bean.goodsCover},
             </if>
             <if test="bean.goodsName != null and bean.goodsName !='' ">
@@ -78,6 +90,18 @@
             </if>
             <if test="bean.price != null and bean.price !='' ">
                 price = #{bean.price},
+            </if>
+            <if test="bean.goodsTrumpDown != null">
+                goods_trump_down = #{bean.goodsTrumpDown},
+            </if>
+            <if test="bean.goodsTrumpUp != null">
+                goods_trump_up = #{bean.goodsTrumpUp},
+            </if>
+            <if test="bean.positiveRating != null">
+                positive_rating = #{bean.positiveRating},
+            </if>
+            <if test="bean.goodsAmount != null and bean.goodsAmount !='' ">
+                goods_amount = #{bean.goodsAmount},
             </if>
             <if test="bean.goodsType != null">
                 goods_type = #{bean.goodsType},
@@ -115,5 +139,10 @@
             </if>
         </where>
         order by positive_rating desc
+    </select>
+    <select id="selectGoodsById" resultMap="goods_info_result_map">
+        select goods_cover, goods_name, positive_rating
+        from goods
+        where goods_id = #{goodsId}
     </select>
 </mapper>

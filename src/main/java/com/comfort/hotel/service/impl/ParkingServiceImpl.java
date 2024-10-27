@@ -6,16 +6,16 @@ import com.aliyun.oss.model.CannedAccessControlList;
 import com.aliyun.oss.model.PutObjectRequest;
 import com.comfort.hotel.config.OSSConfig;
 import com.comfort.hotel.constants.Constants;
-import com.comfort.hotel.domain.dto.CarDTO;
-import com.comfort.hotel.domain.dto.PageDTO;
+import com.comfort.hotel.domain.vo.CarVO;
+import com.comfort.hotel.domain.vo.PageVO;
 import com.comfort.hotel.mapper.ParkingMapper;
 import com.comfort.hotel.mapper.UserMapper;
 import com.comfort.hotel.service.ParkingService;
 import com.comfort.hotel.service.SupervisorService;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.sun.org.slf4j.internal.Logger;
-import com.sun.org.slf4j.internal.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -50,15 +50,15 @@ public class ParkingServiceImpl implements ParkingService {
     // 更新车辆停放信息基本信息
     @Transactional
     @Override
-    public synchronized void updateCarParkingInfo(CarDTO carDTO) {
+    public synchronized void updateCarParkingInfo(CarVO carVO) {
         // 1.更新车辆停放信息表
-        parkingMapper.updateCarParkingInfo(carDTO);
+        parkingMapper.updateCarParkingInfo(carVO);
         // 2.同步到用户表中去
         // 通过车辆id获取用户表中的原有消费
-        Integer costed = userMapper.getUserCost(carDTO.getParkingId());
-        Integer recentCosted = costed + carDTO.getCumulativeCost();
+        Integer costed = userMapper.getUserCost(carVO.getParkingId());
+        Integer recentCosted = costed + carVO.getCumulativeCost();
         // 通过车辆id更新用户表当前的消费费用
-        userMapper.updateUserPresentCost(recentCosted,carDTO.getParkingId());
+        userMapper.updateUserPresentCost(recentCosted, carVO.getParkingId());
     }
 
     // 更新车辆停发图片
@@ -87,15 +87,15 @@ public class ParkingServiceImpl implements ParkingService {
 
     // 分页查询车辆停放信息
     @Override
-    public PageInfo<CarDTO> findCarParkingInList(PageDTO pageDTO) {
+    public PageInfo<CarVO> findCarParkingInList(PageVO pageVO) {
         // 第几页
-        Integer page = pageDTO.getCurrentPage();
+        Integer page = pageVO.getCurrentPage();
         // 每页显示的大小
-        Integer size = pageDTO.getSize();
+        Integer size = pageVO.getSize();
         // 使用pageHelper提高编码效率
         // 默认查询所有记录，PageHelper分页拦截器拦截，即在执行相关Sql之前会拦截自动加上limit
         PageHelper.startPage(page, size);
-        List<CarDTO> list = parkingMapper.selectParkingCarList(pageDTO.getKeyword());
+        List<CarVO> list = parkingMapper.selectParkingCarList(pageVO.getKeyword());
         return new PageInfo<>(list);
     }
 }

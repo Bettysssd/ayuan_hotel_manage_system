@@ -1,7 +1,8 @@
 package com.comfort.hotel.mapper;
 
-import com.comfort.hotel.domain.dto.CarDTO;
-import com.comfort.hotel.domain.dto.WaiterDTO;
+import com.comfort.hotel.domain.vo.CarVO;
+import com.comfort.hotel.domain.vo.OrderVO;
+import com.comfort.hotel.domain.vo.ParkingInfoVO;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -18,10 +19,10 @@ import java.util.List;
 public interface ParkingMapper {
 
     // 更新停车基本信息
-    void updateCarParkingInfo(@Param("bean") CarDTO carDTO);
+    void updateCarParkingInfo(@Param("bean") CarVO carVO);
 
     // 查询停车列表集合
-    List<CarDTO> selectParkingCarList(@Param("keyword") String keyword);
+    List<CarVO> selectParkingCarList(@Param("keyword") String keyword);
 
     // 根据id当前车辆停放信息
     @Delete("delete from parking where parking_id = #{parkingId}")
@@ -32,4 +33,10 @@ public interface ParkingMapper {
     @Select("select count(1) from parking where car_cover = #{carCover}")
     Integer isImgUrlPathExist(@Param("carCover") String carCover);
 
+
+    // 获取当前用户当次车辆停放信息
+    CarVO selectCurrentCarParkingInfo(@Param("parkingId") String objectId);
+
+    // 添加车辆信息
+    void insertCarInfo(@Param("bean") CarVO carVO);
 }

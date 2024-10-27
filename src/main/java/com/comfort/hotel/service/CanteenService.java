@@ -1,7 +1,7 @@
 package com.comfort.hotel.service;
 
-import com.comfort.hotel.domain.dto.CanteenDTO;
-import com.comfort.hotel.domain.dto.PageDTO;
+import com.comfort.hotel.domain.vo.CanteenVO;
+import com.comfort.hotel.domain.vo.PageVO;
 import com.github.pagehelper.PageInfo;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -16,13 +16,13 @@ import java.util.List;
 public interface CanteenService {
 
     // 分页查询食堂信息
-    PageInfo<CanteenDTO> findCanteenInList(PageDTO pageDTO);
+    PageInfo<CanteenVO> findCanteenInList(PageVO pageVO);
 
     // 更新食堂信息
-    void updateCanteenInfo(CanteenDTO canteenDTO);
+    void updateCanteenInfo(CanteenVO canteenVO);
 
     // 录入食堂信息
-    void addCanteenInfo(CanteenDTO canteenDTO);
+    void addCanteenInfo(CanteenVO canteenVO);
 
     // 更新食堂图片
     void uploadCanteenCover(MultipartFile file);

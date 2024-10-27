@@ -1,8 +1,8 @@
 package com.comfort.hotel.controller;
 
-import com.comfort.hotel.domain.dto.PageDTO;
-import com.comfort.hotel.domain.dto.SuperVisorLoginDTO;
-import com.comfort.hotel.domain.dto.UserDTO;
+import com.comfort.hotel.domain.vo.PageVO;
+import com.comfort.hotel.domain.vo.SuperVisorLoginVO;
+import com.comfort.hotel.domain.vo.UserVO;
 import com.comfort.hotel.domain.vo.ResponseVO;
 import com.comfort.hotel.service.SupervisorService;
 import com.github.pagehelper.PageInfo;
@@ -30,24 +30,24 @@ public class SupervisorController {
 
     /**
      * 分页查询用户信息
-     * @param pageDTO
+     * @param pageVO
      * @return
      */
     @ApiOperation(value = "分页查询用户信息")
     @PostMapping("/queryUserList")
-    public ResponseVO<PageInfo<UserDTO>> showUserList(@RequestBody PageDTO pageDTO){
-        PageInfo<UserDTO> userInList = supervisorService.findUserInList(pageDTO);
+    public ResponseVO<PageInfo<UserVO>> showUserList(@RequestBody PageVO pageVO){
+        PageInfo<UserVO> userInList = supervisorService.findUserInList(pageVO);
         return ResponseVO.success(userInList);
     }
 
     /**
      * 修改用户状态
-     * @param userDTO
+     * @param userVO
      */
     @ApiOperation(value = "修改用户状态")
     @PostMapping("/changeUserStatus")
-    public void changeUserStatus( @RequestBody UserDTO userDTO){
-        supervisorService.changeUserStatus(userDTO);
+    public void changeUserStatus( @RequestBody UserVO userVO){
+        supervisorService.changeUserStatus(userVO);
     }
 
     /**
@@ -73,12 +73,12 @@ public class SupervisorController {
     /**
      * 管理员登录
      * @param response
-     * @param superVisorLoginDTO
+     * @param superVisorLoginVO
      */
     @ApiOperation(value = "管理员登录")
     @PostMapping("/login")
-    public void login( HttpServletResponse response, @RequestBody SuperVisorLoginDTO superVisorLoginDTO){
-        supervisorService.login(response, superVisorLoginDTO);
+    public void login( HttpServletResponse response, @RequestBody SuperVisorLoginVO superVisorLoginVO){
+        supervisorService.login(response, superVisorLoginVO);
     }
 
 }

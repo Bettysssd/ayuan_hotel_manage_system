@@ -1,4 +1,4 @@
-package com.comfort.hotel.domain.dto;
+package com.comfort.hotel.domain.vo;
 
 
 import lombok.Data;
@@ -10,7 +10,7 @@ import lombok.Data;
  */
 
 @Data
-public class PageDTO {
+public class PageVO {
     // 管理员模块使用，来区分不同的服务类型
     private int[] jobTypes;
     // 分页查询当前页数
@@ -19,5 +19,7 @@ public class PageDTO {
     private Integer size;
     // 分页查询模糊条件
     private String keyword;
+    // 用户id
+    private String userId;
 
 }

@@ -1,11 +1,6 @@
 package com.comfort.hotel.mapper;
 
-import com.comfort.hotel.domain.dto.RoomDTO;
-import com.comfort.hotel.domain.entity.Supervisor;
 import org.apache.ibatis.annotations.*;
-import org.springframework.web.bind.annotation.DeleteMapping;
-
-import java.util.List;
 
 /**
  * @Author: ayuan

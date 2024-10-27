@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.comfort.hotel.mapper.OrderMapper">
+
+    <resultMap id="order_result_map" type="com.comfort.hotel.domain.vo.OrderVO">
+        <result column="order_id" property="orderId"/>
+        <result column="user_id" property="userId"/>
+        <result column="object_id" property="objectId"/>
+        <result column="object_name" property="objectName"/>
+        <result column="object_status" property="objectStatus"/>
+        <result column="order_amount" property="orderAmount"/>
+        <result column="order_spend" property="orderSpend"/>
+        <result column="order_status" property="orderStatus"/>
+        <result column="display_status" property="displayStatus"/>
+        <result column="book_time" property="bookTime"/>
+        <result column="purchase_time" property="purchaseTime"/>
+        <result column="expired_time" property="expiredTime"/>
+        <result column="order_info" property="orderInfo"/>
+        <result column="waiter_id" property="waiterId"/>
+    </resultMap>
+    <sql id="order_column_list">
+        `order_id`,
+          `user_id`,
+          `object_id`,
+          `object_name`,
+          `order_spend`,
+          `object_status`,
+          `order_amount`,
+          `order_status`,
+          `display_status`,
+          `book_time`,
+          `purchase_time`,
+          `order_info`,
+          `waiter_id`,
+          `expired_time`
+    </sql>
+
+
+    <insert id="addNewOrderInfo" parameterType="com.comfort.hotel.domain.vo.OrderVO">
+        insert into `order`
+        <set>
+            <if test="bean.userId != null and bean.userId != '' ">
+                user_id = #{bean.userId},
+            </if>
+            <if test="bean.orderId != null and bean.orderId != '' ">
+                order_id = #{bean.orderId},
+            </if>
+            <if test="bean.objectId != null and bean.objectId != '' ">
+                object_id = #{bean.objectId},
+            </if>
+            <if test="bean.objectName != null and bean.objectName !='' ">
+                object_name = #{bean.objectName},
+            </if>
+            <if test="bean.objectStatus != null  ">
+                object_status = #{bean.objectStatus},
+            </if>
+            <if test="bean.orderSpend != null and bean.orderSpend != '' ">
+                order_spend = #{bean.orderSpend},
+            </if>
+            <if test="bean.waiterId != null and bean.waiterId != ''">
+                waiter_id = #{bean.waiterId},
+            </if>
+            <if test="bean.orderAmount != null and bean.orderAmount != '' ">
+                order_amount = #{bean.orderAmount},
+            </if>
+            <if test="bean.orderStatus != null and bean.orderStatus != '' ">
+                order_status = #{bean.orderStatus},
+            </if>
+            <if test="bean.displayStatus != null and bean.displayStatus != '' ">
+                display_status = #{bean.displayStatus},
+            </if>
+            <if test="bean.orderInfo != null and bean.orderInfo != '' ">
+                order_info = #{bean.orderInfo},
+            </if>
+        </set>
+    </insert>
+
+    <update id="updateCurrentOrder" parameterType="com.comfort.hotel.domain.vo.OrderVO">
+        update `order`
+        <set>
+            <if test="bean.orderInfo != null and bean.orderInfo != ''">
+                order_info = #{bean.orderInfo},
+            </if>
+            <if test="bean.orderStatus != null">
+                order_status = #{bean.orderStatus},
+            </if>
+            <if test="bean.displayStatus != null">
+                display_status = #{bean.displayStatus},
+            </if>
+            <if test="bean.objectStatus != null">
+                object_status = #{bean.objectStatus},
+            </if>
+            <if test="bean.objectName != null and bean.objectName != ''">
+                object_name = #{bean.objectName},
+            </if>
+            <if test="bean.objectId != null and bean.objectId != ''">
+                object_id = #{bean.objectId},
+            </if>
+            <if test="bean.orderAmount != null and bean.orderAmount != ''">
+                order_amount = #{bean.orderAmount},
+            </if>
+            <if test="bean.orderSpend != null and bean.orderSpend != ''">
+                order_spend = #{bean.orderSpend},
+            </if>
+            <if test="bean.waiterId != null and bean.waiterId != ''">
+                waiter_id = #{bean.waiterId},
+            </if>
+            <if test="bean.purchaseTime != null">
+                purchase_time = #{bean.purchaseTime},
+            </if>
+            <if test="bean.expiredTime != null">
+                expired_time = #{bean.expiredTime},
+            </if>
+
+        </set>
+        where order_id = #{bean.orderId} and user_id = #{bean.userId}
+    </update>
+
+    <select id="selectCurrentUserOrderList" resultMap="order_result_map">
+        select
+        <include refid="order_column_list"/>
+        from `order`
+        <where>
+            <if test="keyword != null and keyword != '' ">
+                AND (
+                order_id LIKE CONCAT('%', #{keyword}, '%')
+                OR object_id LIKE CONCAT('%', #{keyword}, '%')
+                OR object_name LIKE CONCAT('%', #{keyword}, '%')
+                )
+            </if>
+            <if test="userId != null and userId != '' ">
+                and user_id = #{userId} and display_status = 1
+            </if>
+        </where>
+    </select>
+
+    <select id="selectOrderById" resultMap="order_result_map">
+        SELECT
+            <include refid="order_column_list"/>
+            FROM `order` WHERE order_id = #{orderId}
+    </select>
+    <select id="selectOrderByUserId" resultMap="order_result_map">
+        select
+        <include refid="order_column_list"/>
+        from `order`
+        <if test="userId != null and userId != ''">
+            where user_id = #{userId} and order_status = 0 and object_status = 2
+        </if>
+    </select>
+
+
+</mapper>

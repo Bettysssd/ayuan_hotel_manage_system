@@ -4,13 +4,14 @@
 <mapper namespace="com.comfort.hotel.mapper.RoomMapper">
 
 <!--        配置映射关系-->
-    <resultMap id="room_result_map" type="com.comfort.hotel.domain.dto.RoomDTO">
+    <resultMap id="room_result_map" type="com.comfort.hotel.domain.vo.RoomVO">
         <result column="room_id" property="roomId"/>
         <result column="room_cover" property="roomCover"/>
         <result column="room_info" property="roomInfo"/>
         <result column="room_type" property="roomType"/>
         <result column="room_status" property="roomStatus"/>
         <result column="room_mark" property="roomMark"/>
+        <result column="current_mark_people" property="currentMarkPeople"/>
         <result column="number_of_occupants" property="numberOfOccupants"/>
         <result column="list_of_members" property="listOfMembers"/>
         <result column="room_rating" property="roomRating"/>
@@ -22,6 +23,12 @@
         <result column="check_out_time" property="checkOutTime"/>
     </resultMap>
 
+    <resultMap id="room_info_result_map" type="com.comfort.hotel.domain.dto.RoomDTO">
+        <result column="room_cover" property="roomCover"/>
+        <result column="room_type" property="roomType"/>
+        <result column="room_rating" property="roomRating"/>
+    </resultMap>
+
 
     <sql id="room_column_list">
        r.`room_id`,
@@ -30,6 +37,7 @@
        `room_type`,
        `room_status`,
        `room_mark`,
+       `current_mark_people`,
        `number_of_occupants`,
        `price`,
        `room_rating`,
@@ -40,7 +48,7 @@
        `check_out_time`,
     </sql>
 
-    <insert id="addRoomInfo" parameterType="com.comfort.hotel.domain.dto.RoomDTO">
+    <insert id="addRoomInfo" parameterType="com.comfort.hotel.domain.vo.RoomVO">
         insert into room
         <set>
             <if test="bean.roomId != null">
@@ -49,7 +57,7 @@
             <if test="bean.roomInfo != null">
                 room_info = #{bean.roomInfo},
             </if>
-            <if test="bean.roomCover != null">
+            <if test="bean.roomCover != null and bean.roomCover != '' ">
                 room_cover = #{bean.roomCover},
             </if>
             <if test="bean.price != null">
@@ -67,15 +75,27 @@
         </set>
     </insert>
 
-    <update id="updateRoomInfo" parameterType="com.comfort.hotel.domain.dto.RoomDTO">
+    <update id="updateRoomInfo" parameterType="com.comfort.hotel.domain.vo.RoomVO">
         update
             room
       <set>
           <if test="bean.roomInfo != null">
               room_info = #{bean.roomInfo},
           </if>
-          <if test="bean.roomCover != null">
+          <if test="bean.currentMarkPeople != null">
+              current_mark_people = #{bean.currentMarkPeople},
+          </if>
+          <if test="bean.roomCover != null and bean.roomCover != '' ">
               room_cover = #{bean.roomCover},
+          </if>
+            <if test="bean.roomRating != null">
+              room_rating = #{bean.roomRating},
+          </if>
+          <if test="bean.roomTrumpUp != null">
+              room_trump_up = #{bean.roomTrumpUp},
+          </if>
+          <if test="bean.roomTrumpDown != null">
+              room_trump_down = #{bean.roomTrumpDown},
           </if>
           <if test="bean.numberOfOccupants != null">
               number_of_occupants = #{bean.numberOfOccupants},
@@ -88,6 +108,9 @@
           </if>
           <if test="bean.price != null">
               price = #{bean.price},
+          </if>
+          <if test="bean.roomStatus != null">
+              room_status = #{bean.roomStatus},
           </if>
       </set>
         where room_id = #{bean.roomId}
@@ -126,6 +149,12 @@
                 and room_status = #{status}
             </if>
         </where>
+    </select>
+
+    <select id="selectRoomById" resultMap="room_info_result_map">
+        select room_cover, room_type, room_rating
+        from room
+        where room_id = #{roomId}
     </select>
 
 

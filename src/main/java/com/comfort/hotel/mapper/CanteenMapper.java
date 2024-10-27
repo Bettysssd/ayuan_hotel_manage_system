@@ -1,7 +1,7 @@
 package com.comfort.hotel.mapper;
 
 import com.comfort.hotel.domain.dto.CanteenDTO;
-import io.swagger.models.auth.In;
+import com.comfort.hotel.domain.vo.CanteenVO;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -18,13 +18,13 @@ import java.util.List;
 public interface CanteenMapper {
 
     // 分页查询食堂信息
-    List<CanteenDTO> selectCanteenList(String keyword);
+    List<CanteenVO> selectCanteenList(String keyword);
 
     // 更新食堂信息
-    void updateCanteenInfo(@Param("bean") CanteenDTO canteenDTO);
+    int updateCanteenInfo(@Param("bean") CanteenVO canteenVO);
 
     // 录入食堂信息
-    void addCanteenInfo(@Param("bean") CanteenDTO canteenDTO);
+    void addCanteenInfo(@Param("bean") CanteenVO canteenVO);
 
     // 判断数据库中是否存在
     @Select("select count(1) from canteen where canteen_cover = #{canteenCover}")
@@ -54,4 +54,31 @@ public interface CanteenMapper {
     // 更新食堂当前状态
     @Update("update canteen set canteen_open_status = #{canteenOpenStatus} where canteen_id = #{canteenId}")
     Integer updateCanteenOpenStatus(@Param("canteenId") String id,@Param("canteenOpenStatus") Integer target);
+
+    // 根据id查询当前总的就餐人数
+    @Select("select canteen_number_of_diners from canteen where canteen_id = #{canteenId}")
+    Integer selectCanteenNumberOfDinersById(@Param("canteenId") String canteenId);
+
+    // 根据id查询当前总的桌数
+    @Select("select canteen_total_tables from canteen where canteen_id = #{canteenId}")
+    Integer selectCanteenTotalTables(@Param("canteenId") String canteenId);
+
+    // 根据id查询当前空余位置的状态
+    @Select("select canteen_table_status from canteen where canteen_id = #{canteenId}")
+    Integer selectCanteenTableStatus(@Param("canteenId") String canteenId);
+
+    // 根据id查询当前餐厅的名字
+    @Select("select canteen_name from canteen where canteen_id = #{canteenId}")
+    String selectCanteenNameById(@Param("canteenId") String canteenId);
+
+    // 根据id查询当前餐馆信息
+    CanteenDTO selectCanteenById(@Param("canteenId") String canteenId);
+
+    // 查询点赞数
+    @Select("select canteen_trump_up from canteen where canteen_id = #{canteenId}")
+    Integer selectTrumpUp(@Param("canteenId") String canteenId);
+
+    // 查询踩数
+    @Select("select canteen_trump_down from canteen where canteen_id = #{canteenId}")
+    Integer selectTrumpDown(String objectId);
 }

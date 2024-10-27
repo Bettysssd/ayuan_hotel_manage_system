@@ -1,4 +1,4 @@
-package com.comfort.hotel.domain.dto;
+package com.comfort.hotel.domain.vo;
 
 import lombok.Data;
 
@@ -10,7 +10,7 @@ import java.io.Serializable;
  * @Date: 2024/9/2 20:41
  */
 @Data
-public class SysSettingsDTO implements Serializable {
+public class SysSettingsVO implements Serializable {
 
     // 邮箱发送头部
     private String registerEmailTitle = "【悦居酒店】";

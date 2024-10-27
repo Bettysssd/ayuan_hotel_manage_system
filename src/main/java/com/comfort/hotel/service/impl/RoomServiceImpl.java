@@ -6,16 +6,16 @@ import com.aliyun.oss.model.CannedAccessControlList;
 import com.aliyun.oss.model.PutObjectRequest;
 import com.comfort.hotel.config.OSSConfig;
 import com.comfort.hotel.constants.Constants;
-import com.comfort.hotel.domain.dto.PageDTO;
-import com.comfort.hotel.domain.dto.RoomDTO;
+import com.comfort.hotel.domain.vo.PageVO;
+import com.comfort.hotel.domain.vo.RoomVO;
 import com.comfort.hotel.mapper.RoomMapper;
 import com.comfort.hotel.service.RoomService;
 import com.comfort.hotel.service.SupervisorService;
 import com.comfort.hotel.utils.StringTools;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.sun.org.slf4j.internal.Logger;
-import com.sun.org.slf4j.internal.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -39,15 +39,15 @@ public class RoomServiceImpl implements RoomService {
 
     //分页查询房间信息
     @Override
-    public PageInfo<RoomDTO> findRoomInList(PageDTO pageDTO) {
+    public PageInfo<RoomVO> findRoomInList(PageVO pageVO) {
         // 第几页
-        Integer page = pageDTO.getCurrentPage();
+        Integer page = pageVO.getCurrentPage();
         // 每页显示的大小
-        Integer size = pageDTO.getSize();
+        Integer size = pageVO.getSize();
         // 使用pageHelper提高编码效率
         // 默认查询所有记录，PageHelper分页拦截器拦截，即在执行相关Sql之前会拦截自动加上limit
         PageHelper.startPage(page, size);
-        List<RoomDTO> list = roomMapper.selectRoomList(pageDTO.getKeyword());
+        List<RoomVO> list = roomMapper.selectRoomList(pageVO.getKeyword());
         return new PageInfo<>(list);
     }
 
@@ -84,16 +84,16 @@ public class RoomServiceImpl implements RoomService {
 
     // 更新客房基本信息
     @Override
-    public boolean updateRoomInfo(RoomDTO roomDTO) {
+    public boolean updateRoomInfo(RoomVO roomVO) {
         // 判断是否是原来的房间号码
-        String roomMark = roomMapper.getRoomMarkById(roomDTO.getRoomId());
-        if (!roomDTO.getRoomMark().equals(roomMark)) {
-            Integer count = roomMapper.checkRoomMarkIsExist(roomDTO.getRoomMark());
+        String roomMark = roomMapper.getRoomMarkById(roomVO.getRoomId());
+        if (!roomVO.getRoomMark().equals(roomMark)) {
+            Integer count = roomMapper.checkRoomMarkIsExist(roomVO.getRoomMark());
             if (!Constants.ZERO.equals(count)) {
                 return false;
             }
         }
-            roomMapper.updateRoomInfo(roomDTO);
+            roomMapper.updateRoomInfo(roomVO);
             return true;
     }
 
@@ -105,21 +105,21 @@ public class RoomServiceImpl implements RoomService {
 
     // 修改当前房间状态
     @Override
-    public void changeRoomStatus(RoomDTO roomDTO) {
-        roomMapper.changeRoomStatus(roomDTO.getRoomStatus(), roomDTO.getRoomId());
+    public void changeRoomStatus(RoomVO roomVO) {
+        roomMapper.changeRoomStatus(roomVO.getRoomStatus(), roomVO.getRoomId());
     }
 
     // 录入房间信息
     @Override
-    public boolean addRoomInfo(RoomDTO roomDTO) {
+    public boolean addRoomInfo(RoomVO roomVO) {
         // 随机生成roomId
-        roomDTO.setRoomId(StringTools.getRandomString(Constants.LENGTH_7));
+        roomVO.setRoomId(StringTools.getRandomString(Constants.LENGTH_7));
         // 判断待添加的房间号是否已经存在
-        Integer count = roomMapper.checkRoomMarkIsExist(roomDTO.getRoomMark());
+        Integer count = roomMapper.checkRoomMarkIsExist(roomVO.getRoomMark());
         if (!Constants.ZERO.equals(count)) {
             return true;
         } else {
-            roomMapper.addRoomInfo(roomDTO);
+            roomMapper.addRoomInfo(roomVO);
             return false;
         }
 

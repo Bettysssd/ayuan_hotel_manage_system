@@ -1,11 +1,9 @@
 package com.comfort.hotel.controller;
 
-import com.comfort.hotel.domain.dto.CarDTO;
-import com.comfort.hotel.domain.dto.PageDTO;
-import com.comfort.hotel.domain.dto.WaiterDTO;
+import com.comfort.hotel.domain.vo.CarVO;
+import com.comfort.hotel.domain.vo.PageVO;
 import com.comfort.hotel.domain.vo.ResponseVO;
 import com.comfort.hotel.service.ParkingService;
-import com.comfort.hotel.service.WaiterService;
 import com.github.pagehelper.PageInfo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -43,12 +41,12 @@ public class ParkingController {
     /**
      * 更新车辆停放信息
      *
-     * @param carDTO
+     * @param carVO
      */
     @ApiOperation(value = "更新车辆停放信息")
     @PostMapping("/updateCarParkingInfo")
-    public void updateCarParkingInfo(@RequestBody CarDTO carDTO) {
-        parkingService.updateCarParkingInfo(carDTO);
+    public void updateCarParkingInfo(@RequestBody CarVO carVO) {
+        parkingService.updateCarParkingInfo(carVO);
     }
 
     /**
@@ -63,13 +61,13 @@ public class ParkingController {
     /**
      * 分页查询车辆停放信息
      *
-     * @param pageDTO
+     * @param pageVO
      * @return
      */
     @ApiOperation(value = "分页查询车辆停放信息")
     @PostMapping("/queryCarParkingList")
-    public ResponseVO<PageInfo<CarDTO>> queryWaiterList(@RequestBody PageDTO pageDTO) {
-        PageInfo<CarDTO> carParkingInList = parkingService.findCarParkingInList(pageDTO);
+    public ResponseVO<PageInfo<CarVO>> queryWaiterList(@RequestBody PageVO pageVO) {
+        PageInfo<CarVO> carParkingInList = parkingService.findCarParkingInList(pageVO);
         return ResponseVO.success(carParkingInList);
     }
 

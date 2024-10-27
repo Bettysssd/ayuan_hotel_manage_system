@@ -1,14 +1,13 @@
 package com.comfort.hotel.controller;
 
 import com.comfort.hotel.constants.Constants;
-import com.comfort.hotel.domain.dto.PageDTO;
-import com.comfort.hotel.domain.dto.RoomDTO;
+import com.comfort.hotel.domain.vo.PageVO;
+import com.comfort.hotel.domain.vo.RoomVO;
 import com.comfort.hotel.domain.vo.ResponseVO;
 import com.comfort.hotel.service.RoomService;
 import com.github.pagehelper.PageInfo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.models.auth.In;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import javax.annotation.Resource;
@@ -41,12 +40,12 @@ public class RoomController {
     /**
      * 录入房间信息
      *
-     * @param roomDTO
+     * @param roomVO
      */
     @ApiOperation(value = "录入房间信息")
     @PostMapping("/addRoomInfo")
-    public void addRoomInfo(@RequestBody RoomDTO roomDTO, HttpServletResponse response) {
-        if (roomService.addRoomInfo(roomDTO)) {
+    public void addRoomInfo(@RequestBody RoomVO roomVO, HttpServletResponse response) {
+        if (roomService.addRoomInfo(roomVO)) {
             // 设置失败信息标识
             response.setHeader(Constants.ROOM_ADD_ERROR,"unable");
         }
@@ -56,12 +55,12 @@ public class RoomController {
     /**
      * 修改当前房间状态
      *
-     * @param roomDTO
+     * @param roomVO
      */
     @ApiOperation(value = "修改当前房间状态")
     @PostMapping("/changeRoomStatus")
-    public void changeRoomStatus(@RequestBody RoomDTO roomDTO) {
-        roomService.changeRoomStatus(roomDTO);
+    public void changeRoomStatus(@RequestBody RoomVO roomVO) {
+        roomService.changeRoomStatus(roomVO);
     }
 
     /**
@@ -79,12 +78,12 @@ public class RoomController {
     /**
      * 更新客房基本信息
      *
-     * @param roomDTO
+     * @param roomVO
      */
     @ApiOperation(value = "更新客房基本信息")
     @PostMapping("/updateRoomInfo")
-    public void updateRoomInfo(@RequestBody RoomDTO roomDTO, HttpServletResponse response ) {
-        if (!roomService.updateRoomInfo(roomDTO)) {
+    public void updateRoomInfo(@RequestBody RoomVO roomVO, HttpServletResponse response ) {
+        if (!roomService.updateRoomInfo(roomVO)) {
             // 设置失败信息标识
             response.setHeader(Constants.ROOM_UPDATE_ERROR,"unable");
         }
@@ -102,13 +101,13 @@ public class RoomController {
     /**
      * 分页查询房间信息
      *
-     * @param pageDTO
+     * @param pageVO
      * @return
      */
     @ApiOperation(value = "分页查询房间信息")
     @PostMapping("/queryRoomList")
-    public ResponseVO<PageInfo<RoomDTO>> queryRoomList(@RequestBody PageDTO pageDTO) {
-        PageInfo<RoomDTO> roomInList = roomService.findRoomInList(pageDTO);
+    public ResponseVO<PageInfo<RoomVO>> queryRoomList(@RequestBody PageVO pageVO) {
+        PageInfo<RoomVO> roomInList = roomService.findRoomInList(pageVO);
         return ResponseVO.success(roomInList);
     }
 

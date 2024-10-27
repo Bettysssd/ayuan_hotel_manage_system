@@ -1,4 +1,4 @@
-package com.comfort.hotel.domain.dto;
+package com.comfort.hotel.domain.vo;
 
 import lombok.Data;
 
@@ -8,7 +8,7 @@ import lombok.Data;
  * @Date: 2024/9/2 15:28
  */
 @Data
-public class SuperVisorLoginDTO {
+public class SuperVisorLoginVO {
 
     // 账号
     private String account;

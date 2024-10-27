@@ -7,16 +7,16 @@ import com.aliyun.oss.model.CannedAccessControlList;
 import com.aliyun.oss.model.PutObjectRequest;
 import com.comfort.hotel.config.OSSConfig;
 import com.comfort.hotel.constants.Constants;
-import com.comfort.hotel.domain.dto.CanteenDTO;
-import com.comfort.hotel.domain.dto.PageDTO;
+import com.comfort.hotel.domain.vo.CanteenVO;
+import com.comfort.hotel.domain.vo.PageVO;
 import com.comfort.hotel.mapper.CanteenMapper;
 import com.comfort.hotel.service.CanteenService;
 import com.comfort.hotel.service.SupervisorService;
 import com.comfort.hotel.utils.StringTools;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.sun.org.slf4j.internal.Logger;
-import com.sun.org.slf4j.internal.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -42,30 +42,35 @@ public class CanteenServiceImpl implements CanteenService {
 
     // 分页查询食堂信息
     @Override
-    public PageInfo<CanteenDTO> findCanteenInList(PageDTO pageDTO) {
-        // 第几页
-        Integer page = pageDTO.getCurrentPage();
-        // 每页显示的大小
-        Integer size = pageDTO.getSize();
-        // 使用pageHelper提高编码效率
-        // 默认查询所有记录，PageHelper分页拦截器拦截，即在执行相关Sql之前会拦截自动加上limit
-        PageHelper.startPage(page, size);
-        List<CanteenDTO> list = canteenMapper.selectCanteenList(pageDTO.getKeyword());
+    public PageInfo<CanteenVO> findCanteenInList(PageVO pageVO) {
+        List<CanteenVO> list = null;
+        if (pageVO != null) {
+            // 第几页
+            Integer page = pageVO.getCurrentPage();
+            // 每页显示的大小
+            Integer size = pageVO.getSize();
+            // 使用pageHelper提高编码效率
+            // 默认查询所有记录，PageHelper分页拦截器拦截，即在执行相关Sql之前会拦截自动加上limit
+            PageHelper.startPage(page, size);
+            list = canteenMapper.selectCanteenList(pageVO.getKeyword());
+        } else {
+            list = canteenMapper.selectCanteenList("");
+        }
         return new PageInfo<>(list);
     }
 
     // 更新食堂信息
     @Override
-    public void updateCanteenInfo(CanteenDTO canteenDTO) {
-        canteenMapper.updateCanteenInfo(canteenDTO);
+    public void updateCanteenInfo(CanteenVO canteenVO) {
+        canteenMapper.updateCanteenInfo(canteenVO);
     }
 
     // 录入食堂信息
     @Override
-    public void addCanteenInfo(CanteenDTO canteenDTO) {
+    public void addCanteenInfo(CanteenVO canteenVO) {
         // 随机生成roomId
-        canteenDTO.setCanteenId(StringTools.getRandomString(Constants.LENGTH_8));
-        canteenMapper.addCanteenInfo(canteenDTO);
+        canteenVO.setCanteenId(StringTools.getRandomString(Constants.LENGTH_8));
+        canteenMapper.addCanteenInfo(canteenVO);
     }
 
     // 更新食堂信息

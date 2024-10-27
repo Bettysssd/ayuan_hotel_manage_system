@@ -1,7 +1,7 @@
 package com.comfort.hotel.service;
 
-import com.comfort.hotel.domain.dto.CarDTO;
-import com.comfort.hotel.domain.dto.PageDTO;
+import com.comfort.hotel.domain.vo.CarVO;
+import com.comfort.hotel.domain.vo.PageVO;
 import com.github.pagehelper.PageInfo;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -16,11 +16,11 @@ public interface ParkingService {
     void deleteCurrentCarParkingInfo(String carId);
 
     // 更新车辆停放信息基本信息
-    void updateCarParkingInfo(CarDTO carDTO);
+    void updateCarParkingInfo(CarVO carVO);
 
    // 更新车辆停发图片
     void uploadCarParkingCover(MultipartFile file);
 
    // 分页查询车辆停放信息
-    PageInfo<CarDTO> findCarParkingInList(PageDTO pageDTO);
+    PageInfo<CarVO> findCarParkingInList(PageVO pageVO);
 }

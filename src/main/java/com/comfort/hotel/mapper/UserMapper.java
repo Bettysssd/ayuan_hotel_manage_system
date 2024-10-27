@@ -1,8 +1,10 @@
 package com.comfort.hotel.mapper;
 
-import com.comfort.hotel.domain.dto.UserDTO;
-import com.comfort.hotel.domain.dto.UserPayDTO;
+
+import com.comfort.hotel.domain.vo.UserVO;
+import com.comfort.hotel.domain.vo.UserPayVO;
 import org.apache.ibatis.annotations.*;
+
 
 import java.util.List;
 
@@ -38,7 +40,7 @@ public interface UserMapper {
     Integer updateUserPasswordById(@Param("userId") String userId, @Param("newPwd") String newPwd);
 
     // 查询用户列表集合
-    List<UserDTO> selectUserList(@Param("keyword") String keyword);
+    List<UserVO> selectUserList(@Param("keyword") String keyword);
 
     // 获取用户姓名
     @Select("select user_name from user where user_id = #{userId}")
@@ -64,5 +66,42 @@ public interface UserMapper {
     Integer distinguishUserByCondition(@Param("type") Integer type, @Param("status") Integer status);
 
     // 异步获取不同状态下的用户消费情况
-    List<UserPayDTO> getUserDifferentPaySituation(@Param("status") Integer status);
+    List<UserPayVO> getUserDifferentPaySituation(@Param("status") Integer status);
+
+    //根据id获取用户头像
+    @Select("select user_cover from user where user_id = #{userId} ")
+    String getUserAvatarById(@Param("userId") String userId);
+
+    //根据id获取用户基本信息
+    UserVO getUserInfoById(@Param("userId") String userId);
+
+    // 判断图片是否已经上传了
+    @Select("select count(1) from user where user_cover = #{userCover}")
+    int isImgUrlPathExist(@Param("userCover") String userCover);
+
+    // 更新用户信息
+    void updateUserInfo(@Param("bean") UserVO userVO);
+
+    // 查看用户是否已经填完必填的个人信息
+
+    UserVO checkUserInfoAlreadyFinished(@Param("userId") String userId);
+
+    // 通过用户id进行酒店客房预定
+    @Update("update user set room_id = #{roomId} where user_id = #{userId}")
+    void bookHotelByUserId(@Param("roomId") String roomId,@Param("userId") String userId);
+
+    // 判断当前用户是否已经预定过酒店
+    @Select("select room_id from user where user_id = #{userId}")
+    String selectRoomIdByUserId(@Param("userId") String userId);
+
+    // 通过身份证号码查询预定酒店客房id
+    @Select("select room_id from user where id_card_code = #{idCode}")
+    String selectRoomIdByUserIdCardCode(@Param("idCode") String idCode);
+
+    //根据id查找用户信息
+    UserVO selectFourKeyField(@Param("bean") UserVO userVO);
+
+    // 清除用户表中的房间id信息
+    @Update("update user set room_id = null where user_id = #{userId}")
+    void clearUserRoomId(@Param("userId") String userId);
 }

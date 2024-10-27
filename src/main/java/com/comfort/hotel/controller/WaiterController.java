@@ -1,11 +1,9 @@
 package com.comfort.hotel.controller;
 
-import com.comfort.hotel.constants.Constants;
-import com.comfort.hotel.domain.dto.PageDTO;
-import com.comfort.hotel.domain.dto.RoomDTO;
-import com.comfort.hotel.domain.dto.WaiterDTO;
+import com.comfort.hotel.domain.vo.PageVO;
+import com.comfort.hotel.domain.vo.ReviewVO;
+import com.comfort.hotel.domain.vo.WaiterVO;
 import com.comfort.hotel.domain.vo.ResponseVO;
-import com.comfort.hotel.service.RoomService;
 import com.comfort.hotel.service.WaiterService;
 import com.github.pagehelper.PageInfo;
 import io.swagger.annotations.Api;
@@ -14,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletResponse;
 
 /**
  * @Author: ayuan
@@ -29,6 +26,13 @@ public class WaiterController {
     @Resource
     private WaiterService waiterService;
 
+    @ApiOperation(value = "查找不同状态下泊车员的数量")
+    @GetMapping("/distinguishParkingByInStatus")
+    public ResponseVO<Integer> getParkingByStatus(@RequestParam("status") Integer status) {
+        return ResponseVO.success(waiterService.getParkingByStatus(status));
+    }
+
+
     /**
      * 根据工作类型查询不同的管理员人数
      * @param types
@@ -40,14 +44,16 @@ public class WaiterController {
         return ResponseVO.success(waiterService.getWaiterCountByType(types));
     }
 
+
+
     /**
      * 录入服务员信息
-     * @param waiterDTO
+     * @param waiterVO
      */
     @ApiOperation(value = "录入服务员信息")
     @PostMapping("/addWaiterInfo")
-    public void addWaiterInfo(@RequestBody WaiterDTO waiterDTO) {
-        waiterService.addWaiterInfo(waiterDTO);
+    public void addWaiterInfo(@RequestBody WaiterVO waiterVO) {
+        waiterService.addWaiterInfo(waiterVO);
     }
 
 
@@ -62,16 +68,52 @@ public class WaiterController {
         waiterService.deleteCurrentWaiter(waiterId);
     }
 
+    /**
+     * 查看当前服务员和商品信息
+     *
+     * @param waiterId
+     */
+    @ApiOperation(value = "查看当前服务员和商品信息")
+    @GetMapping("/showCurrentWaiterAndGoods")
+    public ResponseVO<ReviewVO> showCurrentWaiterAndGoods(@RequestParam("waiterId") String waiterId,
+                                                          @RequestParam("objectId") String objectId,
+                                                          @RequestParam("objectStatus") Integer objectStatus) {
+        return ResponseVO.success(waiterService.showCurrentWaiterAndGoods(waiterId, objectId, objectStatus));
+    }
+
+    /**
+     * 评价当前服务员和商品
+     * @param waiterId
+     * @param objectId
+     * @param status
+     * @return
+     */
+    @ApiOperation(value = "评价当前服务员和商品")
+    @GetMapping("/review")
+    public ResponseVO review(@RequestParam("waiterId") String waiterId, @RequestParam("objectId") String objectId,
+                             @RequestParam("orderId") String orderId, @RequestParam("userId") String userId,
+                             @RequestParam("objectStatus") Integer objectStatus, @RequestParam("status") Integer status) {
+       boolean result = waiterService.reviewCurrentWaiterAndGoods(waiterId, objectId, orderId, userId, objectStatus, status);
+       if (result) {
+           return ResponseVO.success();
+       } else {
+           return ResponseVO.error("评论失败");
+       }
+
+
+    }
+
+
 
     /**
      * 更新服务员基本信息
      *
-     * @param waiterDTO
+     * @param waiterVO
      */
     @ApiOperation(value = "更新服务员基本信息")
     @PostMapping("/updateWaiterInfo")
-    public void updateWaiterInfo(@RequestBody WaiterDTO waiterDTO) {
-       waiterService.updateWaiterInfo(waiterDTO);
+    public void updateWaiterInfo(@RequestBody WaiterVO waiterVO) {
+       waiterService.updateWaiterInfo(waiterVO);
     }
 
     /**
@@ -86,13 +128,13 @@ public class WaiterController {
     /**
      * 分页查询服务员信息
      *
-     * @param pageDTO
+     * @param pageVO
      * @return
      */
     @ApiOperation(value = "分页服务员信息")
     @PostMapping("/queryWaiterList")
-    public ResponseVO<PageInfo<WaiterDTO>> queryWaiterList(@RequestBody PageDTO pageDTO) {
-        PageInfo<WaiterDTO> waiterInList = waiterService.findWaiterInList(pageDTO);
+    public ResponseVO<PageInfo<WaiterVO>> queryWaiterList(@RequestBody PageVO pageVO) {
+        PageInfo<WaiterVO> waiterInList = waiterService.findWaiterInList(pageVO);
         return ResponseVO.success(waiterInList);
     }
 

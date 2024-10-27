@@ -1,4 +1,4 @@
-package com.comfort.hotel.domain.dto;
+package com.comfort.hotel.domain.vo;
 
 import lombok.Data;
 
@@ -8,7 +8,7 @@ import lombok.Data;
  * @Date: 2024/8/29 11:34
  */
 @Data
-public class UserLoginDTO {
+public class UserLoginVO {
 
     // 账号
     private String email;

@@ -36,4 +36,11 @@ public class ResponseVO<T> implements Serializable {
         result.code = 0;
         return result;
     }
+
+    public static <T> ResponseVO<T> errorWithStatus(String msg, Integer status) {
+        ResponseVO result = new ResponseVO();
+        result.msg = msg;
+        result.code = status;
+        return result;
+    }
 }

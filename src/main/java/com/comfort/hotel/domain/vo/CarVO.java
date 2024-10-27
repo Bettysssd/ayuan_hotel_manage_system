@@ -1,7 +1,9 @@
-package com.comfort.hotel.domain.dto;
+package com.comfort.hotel.domain.vo;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
+
+import java.time.LocalDateTime;
 
 
 /**
@@ -10,18 +12,20 @@ import lombok.Data;
  * @Date: 2024/9/5 15:14
  */
 @Data
-public class CarDTO {
+public class CarVO {
 
     private String parkingId;
     private String carCover;
+    private String carName;
+    private String carNumber;
     private String carOwnerName;
     private String carOwnerContact;
     private Integer carStatus;
     private Integer cumulativeCost;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Shanghai")
-    private String lastParkingTime;
+    private LocalDateTime lastParkingTime;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Shanghai")
-    private String lastLeaveTime;
+    private LocalDateTime lastLeaveTime;
 
 
 

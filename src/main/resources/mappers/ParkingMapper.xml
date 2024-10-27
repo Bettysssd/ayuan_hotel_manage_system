@@ -4,8 +4,10 @@
 <mapper namespace="com.comfort.hotel.mapper.ParkingMapper">
 
 <!-- 配置映射关系-->
-    <resultMap id="parking_result_map" type="com.comfort.hotel.domain.dto.CarDTO">
+    <resultMap id="parking_result_map" type="com.comfort.hotel.domain.vo.CarVO">
         <result column="parking_id" property="parkingId"/>
+        <result column="car_name" property="carName"/>
+        <result column="car_number" property="carNumber"/>
         <result column="car_cover" property="carCover"/>
         <result column="car_owner_name" property="carOwnerName"/>
         <result column="car_owner_contact" property="carOwnerContact"/>
@@ -15,25 +17,73 @@
         <result column="last_leave_time" property="lastLeaveTime"/>
     </resultMap>
 
-
     <sql id="parking_column_list">
        p.`parking_id`,
        `car_cover`,
        `car_status`,
+        `car_name`,
+        `car_number`,
        `cumulative_cost`,
        `last_parking_time`,
        `last_leave_time`,
     </sql>
 
+    <sql id="parking1_column_list">
+       `car_cover`,
+       `car_status`,
+        `car_name`,
+        `car_number`,
+       `cumulative_cost`,
+       `last_parking_time`,
+       `last_leave_time`
+    </sql>
 
-    <update id="updateCarParkingInfo" parameterType="com.comfort.hotel.domain.dto.CarDTO">
-        update parking
+    <insert id="insertCarInfo">
+        insert into
+            parking
         <set>
-            <if test="bean.carCover != null">
+            <if test="bean.carCover != null and bean.carCover != ''">
                 car_cover = #{bean.carCover},
             </if>
             <if test="bean.carStatus != null">
                 car_status = #{bean.carStatus},
+            </if>
+            <if test="bean.carName != null">
+                car_name = #{bean.carName},
+            </if>
+            <if test="bean.carNumber != null">
+                car_number = #{bean.carNumber},
+            </if>
+            <if test="bean.cumulativeCost != null">
+                cumulative_cost = #{bean.cumulativeCost},
+            </if>
+            <if test="bean.lastParkingTime != null">
+                last_parking_time = #{bean.lastParkingTime},
+            </if>
+            <if test="bean.lastLeaveTime != null">
+                last_leave_time = #{bean.lastLeaveTime},
+            </if>
+            <if test="bean.parkingId != null">
+                parking_id = #{bean.parkingId},
+            </if>
+        </set>
+    </insert>
+
+
+    <update id="updateCarParkingInfo" parameterType="com.comfort.hotel.domain.vo.CarVO">
+        update parking
+        <set>
+            <if test="bean.carCover != null and bean.carCover != ''">
+                car_cover = #{bean.carCover},
+            </if>
+            <if test="bean.carStatus != null">
+                car_status = #{bean.carStatus},
+            </if>
+            <if test="bean.carName != null">
+                car_name = #{bean.carName},
+            </if>
+            <if test="bean.carNumber != null">
+                car_number = #{bean.carNumber},
             </if>
             <if test="bean.cumulativeCost != null">
                 cumulative_cost = #{bean.cumulativeCost},
@@ -54,7 +104,8 @@
         user.user_name  AS `car_owner_name`,
         user.phone_number AS `car_owner_contact`
         from parking p
-        left join user on user.parking_id = p.parking_id
+        left join `order` on `order`.object_id = p.parking_id
+        left join user on `order`.user_id = user.user_id
         <where>
             <if test="keyword != null and keyword != ''">
             AND (
@@ -65,4 +116,11 @@
         </where>
         order by p.cumulative_cost desc
     </select>
+
+    <select id="selectCurrentCarParkingInfo" resultMap="parking_result_map">
+        select <include refid="parking1_column_list"/>
+        from parking
+        where parking_id = #{parkingId}
+    </select>
+
 </mapper>

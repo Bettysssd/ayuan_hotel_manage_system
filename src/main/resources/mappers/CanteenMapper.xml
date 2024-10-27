@@ -4,7 +4,7 @@
 <mapper namespace="com.comfort.hotel.mapper.CanteenMapper">
 
 <!-- 配置映射关系-->
-    <resultMap id="canteen_result_map" type="com.comfort.hotel.domain.dto.CanteenDTO">
+    <resultMap id="canteen_result_map" type="com.comfort.hotel.domain.vo.CanteenVO">
         <result column="canteen_id" property="canteenId"/>
         <result column="canteen_cover" property="canteenCover"/>
         <result column="canteen_name" property="canteenName"/>
@@ -21,6 +21,13 @@
         <result column="canteen_rating" property="canteenRating"/>
         <result column="canteen_trump_up" property="canteenTrumpUp"/>
         <result column="canteen_trump_down" property="canteenTrumpDown"/>
+    </resultMap>
+
+    <!-- 配置映射关系-->
+    <resultMap id="canteen_info_result_map" type="com.comfort.hotel.domain.dto.CanteenDTO">
+        <result column="canteen_cover" property="canteenCover"/>
+        <result column="canteen_name" property="canteenName"/>
+        <result column="canteen_rating" property="canteenRating"/>
     </resultMap>
 
 
@@ -47,7 +54,7 @@
             <if test="bean.canteenId != null">
                 canteen_id = #{bean.canteenId},
             </if>
-            <if test="bean.canteenCover != null">
+            <if test="bean.canteenCover != null and bean.canteenCover != ''">
                 canteen_cover = #{bean.canteenCover},
             </if>
             <if test="bean.canteenName != null">
@@ -83,7 +90,7 @@
     <update id="updateCanteenInfo">
         update canteen
         <set>
-            <if test="bean.canteenCover != null">
+            <if test="bean.canteenCover != null and bean.canteenCover != '' ">
                 canteen_cover = #{bean.canteenCover},
             </if>
             <if test="bean.canteenName != null">
@@ -94,6 +101,15 @@
             </if>
             <if test="bean.canteenOpenStatus != null">
                 canteen_open_status = #{bean.canteenOpenStatus},
+            </if>
+            <if test="bean.canteenTrumpUp != null">
+                canteen_trump_up = #{bean.canteenTrumpUp},
+            </if>
+            <if test="bean.canteenTrumpDown != null">
+                canteen_trump_down = #{bean.canteenTrumpDown},
+            </if>
+            <if test="bean.canteenRating != null">
+                canteen_rating = #{bean.canteenRating},
             </if>
             <if test="bean.canteenNumberOfDiners != null">
                 canteen_number_of_diners = #{bean.canteenNumberOfDiners},
@@ -136,5 +152,11 @@
             </if>
         </where>
         order by canteen_open_status desc
+    </select>
+
+    <select id="selectCanteenById" resultMap="canteen_info_result_map">
+        select  canteen_cover, canteen_name, canteen_rating
+        from canteen
+        where canteen_id = #{canteenId}
     </select>
 </mapper>

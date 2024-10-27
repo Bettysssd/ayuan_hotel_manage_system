@@ -6,18 +6,16 @@ import com.aliyun.oss.model.CannedAccessControlList;
 import com.aliyun.oss.model.PutObjectRequest;
 import com.comfort.hotel.config.OSSConfig;
 import com.comfort.hotel.constants.Constants;
-import com.comfort.hotel.domain.dto.CanteenDTO;
-import com.comfort.hotel.domain.dto.GoodsDTO;
-import com.comfort.hotel.domain.dto.PageDTO;
-import com.comfort.hotel.mapper.CanteenMapper;
+import com.comfort.hotel.domain.vo.GoodsVO;
+import com.comfort.hotel.domain.vo.PageVO;
 import com.comfort.hotel.mapper.GoodsMapper;
 import com.comfort.hotel.service.GoodsService;
 import com.comfort.hotel.service.SupervisorService;
 import com.comfort.hotel.utils.StringTools;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.sun.org.slf4j.internal.Logger;
-import com.sun.org.slf4j.internal.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -40,22 +38,22 @@ public class GoodsServiceImpl implements GoodsService {
 
     // 分页查询商品信息
     @Override
-    public PageInfo<GoodsDTO> findGoodsInList(PageDTO pageDTO) {
+    public PageInfo<GoodsVO> findGoodsInList(PageVO pageVO) {
         // 第几页
-        Integer page = pageDTO.getCurrentPage();
+        Integer page = pageVO.getCurrentPage();
         // 每页显示的大小
-        Integer size = pageDTO.getSize();
+        Integer size = pageVO.getSize();
         // 使用pageHelper提高编码效率
         // 默认查询所有记录，PageHelper分页拦截器拦截，即在执行相关Sql之前会拦截自动加上limit
         PageHelper.startPage(page, size);
-        List<GoodsDTO> list = goodsMapper.selectGoodsList(pageDTO.getKeyword());
+        List<GoodsVO> list = goodsMapper.selectGoodsList(pageVO.getKeyword());
         return new PageInfo<>(list);
     }
 
     // 更新商品信息
     @Override
-    public void updateGoodsInfo(GoodsDTO goodsDTO) {
-        goodsMapper.updateGoodsInfo(goodsDTO);
+    public void updateGoodsInfo(GoodsVO goodsVO) {
+        goodsMapper.updateGoodsInfo(goodsVO);
     }
 
 
@@ -92,9 +90,9 @@ public class GoodsServiceImpl implements GoodsService {
 
     // 录入商品信息
     @Override
-    public void addGoodsInfo(GoodsDTO goodsDTO) {
+    public void addGoodsInfo(GoodsVO goodsVO) {
         // 随机生成roomId
-        goodsDTO.setGoodsId(StringTools.getRandomString(Constants.LENGTH_8));
-        goodsMapper.addGoodsInfo(goodsDTO);
+        goodsVO.setGoodsId(StringTools.getRandomString(Constants.LENGTH_8));
+        goodsMapper.addGoodsInfo(goodsVO);
     }
 }

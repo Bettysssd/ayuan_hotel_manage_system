@@ -4,7 +4,7 @@
 <mapper namespace="com.comfort.hotel.mapper.UserMapper">
 
 <!--        配置映射关系-->
-    <resultMap id="user_result_map" type="com.comfort.hotel.domain.dto.UserDTO">
+    <resultMap id="user_result_map" type="com.comfort.hotel.domain.vo.UserVO">
         <result column="user_id" property="userId"/>
         <result column="user_cover" property="userCover"/>
         <result column="user_name" property="userName"/>
@@ -18,9 +18,12 @@
         <result column="room_mark" property="roomMark"/>
         <result column="user_status" property="userStatus"/>
         <result column="pay_status" property="payStatus"/>
+        <result column="room_id" property="roomId"/>
     </resultMap>
 
-    <resultMap id="userPay_result_map" type="com.comfort.hotel.domain.dto.UserPayDTO">
+
+
+    <resultMap id="userPay_result_map" type="com.comfort.hotel.domain.vo.UserPayVO">
         <result column="user_name" property="userName"/>
         <result column="spend_amount" property="fee"/>
     </resultMap>
@@ -39,26 +42,57 @@
         `wechat_account`,
         `user_status`,
         `pay_status`,
+        user.`room_id`
     </sql>
 
-    <sql id="room_column_list">
-       r.`room_id`,
-      `room_cover`,
-       r.`room_info`,
-       `room_type`,
-       `room_status`,
-       `room_mark`,
-       `number_of_occupants`,
-       `book_time`,
-       `check_in_time`,
-       `check_out_time`,
-    </sql>
 
+    <update id="updateUserInfo">
+        update user
+        <set>
+            <if test="bean.userCover != null and bean.userCover != ''">
+                user_cover = #{bean.userCover},
+            </if>
+            <if test="bean.userName != null and bean.userName != '' ">
+                user_name = #{bean.userName},
+            </if>
+            <if test="bean.gender != null ">
+                gender = #{bean.gender},
+            </if>
+            <if test="bean.idCardCode != null and bean.idCardCode != '' ">
+                id_card_code = #{bean.idCardCode},
+            </if>
+            <if test="bean.phoneNumber != null and bean.phoneNumber != '' ">
+                phone_number = #{bean.phoneNumber},
+            </if>
+            <if test="bean.spendAmount != null ">
+                spend_amount = #{bean.spendAmount},
+            </if>
+            <if test="bean.wechatAccount != null and bean.wechatAccount != '' ">
+                wechat_account = #{bean.wechatAccount},
+            </if>
+            <if test="bean.roomMark != null and bean.roomMark != ''">
+                room_mark = #{bean.roomMark},
+            </if>
+            <if test="bean.userStatus != null">
+                user_status = #{bean.userStatus},
+            </if>
+            <if test="bean.payStatus != null">
+                pay_status = #{bean.payStatus},
+            </if>
+            <if test="bean.roomId!= null">
+                room_id = #{bean.roomId},
+            </if>
+        </set>
+        <if test="bean.userId != null and bean.userId != ''">
+            where user_id = #{bean.userId}
+        </if>
+
+    </update>
 
 
     <select id="selectUserList" resultMap="user_result_map">
        select
-           <include refid="user_column_list"/> `room_mark`
+           <include refid="user_column_list"/>, `room_mark`
        from user
        left join room on user.room_id = room.room_id
        <where>
@@ -74,6 +108,7 @@
            </if>
        </where>
    </select>
+
     <select id="distinguishUserByCondition" resultType="java.lang.Integer">
         select count(1)
         from user
@@ -92,11 +127,49 @@
         select `user_name`,`spend_amount`
         from user
         <if test="status != null">
-            where `pay_status` = #{status}
+            where `pay_status` = #{status} and`spend_amount` is not null
         </if>
         order by `spend_amount` desc
         limit 5
     </select>
+
+    <select id="getUserInfoById" resultMap="user_result_map">
+        select
+            <include refid="user_column_list"/>
+         from user
+         <if test="userId != null and userId != ''">
+             where user_id = #{userId}
+         </if>
+
+    </select>
+    <select id="checkUserInfoAlreadyFinished" resultMap="user_result_map">
+        select
+            <include refid="user_column_list"/>
+        from user
+        <if test="userId != null">
+            where user_id = #{userId}
+        </if>
+    </select>
+    <select id="selectFourKeyField" resultMap="user_result_map" parameterType="com.comfort.hotel.domain.vo.UserVO">
+        select email, id_card_code, phone_number, wechat_account,user_id
+        from user
+        <where>
+            <if test="bean.email != null">
+                and email = #{bean.email}
+            </if>
+            <if test="bean.idCardCode != null">
+                and id_card_code = #{bean.idCardCode}
+            </if>
+            <if test=" bean.phoneNumber != null">
+                and phone_number = #{bean.phoneNumber}
+            </if>
+            <if test="bean.wechatAccount != null">
+                and wechat_account = #{bean.wechatAccount}
+            </if>
+        </where>
+    </select>
+
+
 
 
 </mapper>
