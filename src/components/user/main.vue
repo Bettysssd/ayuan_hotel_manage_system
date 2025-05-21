@@ -293,24 +293,34 @@ const modifyUserInfo = async ( formEl: FormInstance | undefined) => {
   if (!formEl) {
       return;
   }
-  await formEl.validate((valid, fields) => {
-    if (valid) {
-        axiosInstance.post(`/api/user/updateUserInfo`, userEditInfo)
-       .then(response => {
-        if (response.data.msg != null) {
-          noticeError(response.data.msg);
-          return;
-        }
-          notice("修改个人信息成功，请刷新浏览器后，继续操作！");
-          localStorage.setItem('userName', userEditInfo.userName);
-          userName.value = userEditInfo.userName;
-          userAvatar.value = userEditInfo.userCover;
-          dialogInfoVisible.value = false;
-      })
-    } else {
-      noticeError("表单不完整或数据格式不正确。请仔细检查，再进行提交！")
+ await formEl.validate(async (valid, fields) => {
+  if (valid) {
+    try {
+      const response = await axiosInstance.post(`/api/user/updateUserInfo`, userEditInfo);
+      
+      if (response.data.msg != null) {
+        // 如果响应中有错误信息，调用错误通知
+        noticeError(response.data.msg);
+        return;
+      }
+
+      // 成功的情况
+      notice("修改个人信息成功，请刷新浏览器后，继续操作！");
+      localStorage.setItem('userName', userEditInfo.userName);
+      userName.value = userEditInfo.userName;
+      userAvatar.value = userEditInfo.userCover;
+      dialogInfoVisible.value = false;
+
+    } catch (error) {
+      // 捕获请求中的异常并抛出
+      noticeError("当前用户所填信息不唯一，请检查！");
+      throw error;  // 自动抛出异常以供上层处理
     }
-  })
+  } else {
+    noticeError("表单不完整或数据格式不正确。请仔细检查，再进行提交！");
+  }
+});
+
 }
 
 // 完善用户个人资料
